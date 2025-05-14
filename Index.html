@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="app-browser-title">Scrum App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #374151; color: #f3f4f6; }
+        .app-header { border-bottom: 1px solid #4b5563; padding-bottom: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .app-header-title { order: 1; width: 100%; text-align: center; margin-bottom: 0.5rem; }
+        .app-header-user-info { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .user-greeting { font-size: 0.9rem; color: #d1d5db; margin-bottom: 0.25rem; }
+        @media (min-width: 768px) { 
+            .app-header { flex-wrap: nowrap; }
+            .app-header-title { order: 1; width: auto; text-align: left; margin-bottom: 0; margin-right: auto; }
+            .app-header-user-info { order: 2; width: auto; flex-direction: row; align-items: center; }
+            .user-greeting { margin-bottom: 0; margin-right: 1rem; }
+        }
+        .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; overflow: hidden; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
+        .card-header { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2, .card-header h3 { font-size: 1.125rem; font-weight: 600; color: #1f2937; }
+        .card-header .counter { font-size: 0.875rem; font-weight: 500; color: #4b5563; background-color: #e5e7eb; padding: 4px 8px; border-radius: 9999px; }
+        .general-progress-container { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; }
+        .general-progress-bar-bg { background-color: #e5e7eb; border-radius: 9999px; height: 0.75rem; }
+        .general-progress-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out; } /* Color se aplica dinámicamente */
+        .general-progress-text { font-size: 0.75rem; font-weight: 500; color: #4b5563; }
+        .announcements-container { margin-bottom: 1rem; }
+        .announcement-bubble { background-color: #e0f2fe; border: 1px solid #bae6fd; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px; margin-bottom: 0.5rem; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
+        .announcement-content { flex-grow: 1; font-size: 0.875rem; color: #075985; margin-right: 10px; }
+        .announcement-content a { color: #0369a1; font-weight: 500; text-decoration: none; }
+        .announcement-content a:hover { text-decoration: underline; }
+        .announcement-tag-and-close { display: flex; align-items: center; flex-shrink: 0; }
+        .announcement-tag-and-close .tag { padding: 2px 6px; border-radius: 9999px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-right: 8px; }
+        .announcement-close-btn { background: none; border: none; font-size: 1.25rem; color: #0ea5e9; cursor: pointer; padding: 0; line-height: 1; }
+        .announcement-close-btn:hover { color: #0284c7; }
+        .filters-wrapper { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem; background-color: transparent; border-radius: 8px; align-items: flex-end; }
+        .filter-container { display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; min-width: 180px; }
+        .filter-container label { font-size: 0.875rem; font-weight: 500; color: #d1d5db; }
+        .filter-container label i { margin-right: 4px; }
+        .filter-container select { padding: 6px 10px; border-radius: 6px; border: 1px solid #6b7280; background-color: #4b5563; color: #f3f4f6; font-size: 0.875rem; width: 100%; }
+        #clear-filters-btn { padding: 6px 12px; background-color: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease; height: 34px; flex-shrink: 0; }
+        #clear-filters-btn:hover { background-color: #5a636e; }
+        #clear-filters-btn i { margin-right: 4px; }
+        .scrollable-list-container { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .list-item { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item-content-wrapper { display: flex; flex-direction: column; flex-grow: 1; margin-right: 1rem; min-width: 0; }
+        .list-item-content, .list-item-content-link { color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-item-content-link { color: #2563eb; text-decoration: none; }
+        .list-item-content-link:hover { text-decoration: underline; white-space: normal; }
+        .list-item-content-link .fa-external-link-alt { font-size: 0.7em; margin-left: 4px; opacity: 0.7; }
+        .list-item-responsible { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
+        .feature-item-meta { font-size: 0.70rem; color: #4b5563; margin-top: 3px; }
+        .list-item-badge { padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
+        .badge-gray { background-color: #e5e7eb; color: #4b5563; }
+        .badge-green { background-color: #dcfce7; color: #166534; }
+        .badge-red { background-color: #fee2e2; color: #991b1b; }
+        .badge-orange { background-color: #ffedd5; color: #c2410c; }
+        .badge-blue { background-color: #e0f2fe; color: #0c4a6e; }  
+        .badge-yellow { background-color: #fef9c3; color: #713f12; } 
+        .badge-purple { background-color: #f3e8ff; color: #581c87; } 
+        .badge-teal { background-color: #ccfbf1; color: #0f766e; } 
+        .badge-pink { background-color: #fce7f3; color: #9d174d; } 
+        #quick-links-wrapper { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .quick-link { display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; text-decoration: none; }
+        .quick-link:last-child { margin-bottom: 0; }
+        .quick-link:hover { background-color: #eff6ff; border-color: #dbeafe; color: #1d4ed8; }
+        .quick-link i { margin-right: 10px; color: #60a5fa; width: 20px; text-align: center; }
+        .quick-link:hover i { color: #3b82f6; }
+        .sprint-countdown-text { font-size: 1.5rem; font-weight: 700; color: #1f2937; line-height: 1.2; }
+        .sprint-countdown-label { font-size: 0.875rem; color: #4b5563; }
+        .sprint-info-card .card-header h3 { color: #1f2937; }
+        .user-stories-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .user-stories-table th, .user-stories-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e5e7eb; color: #374151; vertical-align: middle; word-wrap: break-word; }
+        .user-stories-table th.col-story, .user-stories-table td.col-story { width: 45%; }
+        .user-stories-table th.col-status, .user-stories-table td.col-status { width: 20%; min-width: 100px; }
+        .user-stories-table th.col-seguimiento, .user-stories-table td.col-seguimiento { width: 20%; min-width: 100px; }
+        .user-stories-table th.col-enlace, .user-stories-table td.col-enlace { width: 15%; min-width: 90px; }
+        .user-stories-table th { background-color: #f9fafb; font-weight: 600; color: #1f2937; }
+        .user-stories-table td .list-item-badge { padding: 3px 8px; }
+        .user-stories-table a { color: #3b82f6; text-decoration: none; display: inline-flex; align-items: center; }
+        .user-stories-table a:hover { text-decoration: underline; }
+        .mood-emojis { display: flex; justify-content: space-around; align-items: center; padding: 10px 0; }
+        .mood-emoji { font-size: 2rem; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.2s ease, background-color 0.2s ease; border: 2px solid transparent; color: #1f2937; }
+        .mood-emoji:hover { transform: scale(1.15); }
+        .mood-emoji.selected { transform: scale(1.2); border-color: #60a5fa; }
+        .team-mood-card-content { text-align: center; padding: 10px; font-size: 0.9rem; color: #4b5563;}
+        .team-mood-card-content i.fa-users { margin-right: 4px; color: #6b7280; }
+        .team-mood-card-content #team-mood-emoji-dynamic { font-size: 1.1rem; }
+        .comments-card textarea { width: 100%; min-height: 80px; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; margin-bottom: 0.75rem; font-size: 0.875rem; resize: vertical; color: #1f2937; background-color: #f9fafb; }
+        .comments-card textarea::placeholder { color: #6b7280; }
+        .comments-card button { padding: 8px 15px; background-color: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease; width: 100%; }
+        .comments-card button:hover { background-color: #2563eb; }
+        .comments-card button i { margin-right: 6px; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 1.2rem; z-index: 9999; text-align: center; padding: 20px; }
+        #loading-overlay .spinner { font-size: 2.5rem; margin-bottom: 15px; }
+        #loading-overlay p { word-break: break-word; }
+        #loading-overlay ul { margin-top: 0.5rem; padding-left: 20px; }
+        #loading-overlay li { text-align: left; margin-bottom: 0.25rem; }
+        .help-chat-bubble { position: fixed; bottom: 20px; right: 20px; background-color: #2563eb; color: white; padding: 10px 15px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; transition: background-color 0.2s ease, transform 0.2s ease; z-index: 1000; text-decoration: none; }
+        .help-chat-bubble:hover { background-color: #1d4ed8; transform: scale(1.05); }
+        .help-chat-bubble i { margin-right: 8px; font-size: 1.2rem; }
+        .podium-item .progress-bar-container { margin-top: 2px; height: 10px; background-color: #e5e7eb; border-radius: 9999px; overflow:hidden; } 
+        .podium-item .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out;}
+        .podium-responsible-name { font-weight: 500; color: #374151; }
+        .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: 8px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div id="loading-overlay" style="display: none;">
+        <i class="fas fa-spinner fa-spin spinner"></i>
+        <p id="loading-message">Cargando datos...</p>
+    </div>
+
+    <header class="app-header">
+        <div class="app-header-title">
+            <h1 id="app-main-title" class="text-2xl md:text-3xl font-bold text-gray-100">Scrum App</h1>
+        </div>
+        <div class="app-header-user-info">
+            <div id="user-greeting-container" class="user-greeting" style="display: none;">
+                Hola, <span id="user-greeting-email"></span>!
+            </div>
+        </div>
+    </header>
+
+    <div id="announcements-container" class="announcements-container">
+    </div>
+
+    <div class="filters-wrapper">
+        <div class="filter-container">
+            <label for="global-responsible-filter"><i class="fas fa-user-check"></i>Seguimiento:</label>
+            <select id="global-responsible-filter">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <div class="filter-container">
+            <label for="global-status-filter"><i class="fas fa-check-circle"></i>Estatus:</label>
+            <select id="global-status-filter">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <button id="clear-filters-btn"><i class="fas fa-eraser"></i> Limpiar Filtros</button>
+    </div>
+
+    <section class="card mb-6">
+        <div class="card-header">
+            <h2><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario</h2>
+            <span class="counter" id="user-stories-counter">Desplegadas: 0 de 0</span>
+        </div>
+        <div class="general-progress-container">
+            <div class="flex justify-between items-center mb-1">
+                <span class="general-progress-text">Progreso General</span>
+                <span id="user-stories-progress-percentage" class="general-progress-text">0%</span>
+            </div>
+            <div class="general-progress-bar-bg">
+                <div id="user-stories-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div class="scrollable-list-container overflow-x-auto"> 
+            <table class="user-stories-table">
+                <thead>
+                    <tr>
+                        <th class="col-story">Historia</th>
+                        <th class="col-status">Estatus</th>
+                        <th class="col-seguimiento">Seguimiento</th>
+                        <th class="col-enlace">Enlace</th>
+                    </tr>
+                </thead>
+                <tbody id="user-stories-table-body">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-rocket mr-2 text-purple-500"></i>Features</h2>
+                    <span class="counter" id="features-counter">Desplegadas: 0 de 0</span>
+                </div>
+                <div class="general-progress-container">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="general-progress-text">Progreso General</span>
+                        <span id="features-progress-percentage" class="general-progress-text">0%</span>
+                    </div>
+                    <div class="general-progress-bar-bg">
+                        <div id="features-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="scrollable-list-container">
+                    <ul id="features-q-list">
+                    </ul>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-project-diagram mr-2 text-teal-500"></i>Dependencias</h2>
+                    <span class="counter" id="dependencies-counter">Desplegadas: 0 de 0</span>
+                </div>
+                 <div class="general-progress-container">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="general-progress-text">Progreso General</span>
+                        <span id="dependencies-progress-percentage" class="general-progress-text">0%</span>
+                    </div>
+                    <div class="general-progress-bar-bg">
+                        <div id="dependencies-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="scrollable-list-container">
+                    <ul id="dependencies-list">
+                    </ul>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-trophy mr-2 text-yellow-600"></i>Podio del Q</h2>
+                </div>
+                <div id="podium-container" class="p-4 space-y-3 scrollable-list-container">
+                    <p id="no-podium-data-message" class="text-sm text-gray-700" style="display:none;">No hay datos para mostrar en el podio.</p>
+                </div>
+            </section>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6">
+            <section class="card sprint-info-card"> 
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Sprint: <span id="sprint-identifier-display">CARGANDO...</span>
+                    </h3>
+                </div>
+                <div class="p-6 text-center">
+                    <p class="sprint-countdown-text" id="sprint-countdown-display">-- : -- : -- : --</p>
+                    <p class="sprint-countdown-label">para finalizar</p>
+                </div>
+            </section>
+
+            <section class="card" id="team-message-card">
+                <div class="card-header">
+                    <h3 id="team-message-card-title"><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Mensajes</h3>
+                </div>
+                <div class="p-4">
+                    <p id="team-message-content" class="text-sm text-gray-700 leading-relaxed">Cargando mensaje...</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-smile-beam mr-2 text-yellow-500"></i>Tu Mood Hoy</h3>
+                </div>
+                <div class="p-4">
+                    <div class="mood-emojis" id="mood-selector">
+                        <span class="mood-emoji" data-mood="😞" title="Triste">😞</span>
+                        <span class="mood-emoji" data-mood="😐" title="Neutral">😐</span>
+                        <span class="mood-emoji" data-mood="😊" data-default="true" title="Feliz">😊</span>
+                        <span class="mood-emoji" data-mood="😄" title="Muy Feliz">😄</span>
+                        <span class="mood-emoji" data-mood="🎉" title="¡Genial!">🎉</span>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="card" id="team-mood-display-card" style="display: none;">
+                 <div class="card-header">
+                    <h3><i class="fas fa-users mr-2 text-green-500"></i>Mood del Equipo (Hoy)</h3>
+                </div>
+                <div class="team-mood-card-content">
+                     <span id="team-mood-emoji-dynamic">😊</span>
+                </div>
+            </section>
+            
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-link mr-2 text-green-500"></i>Enlaces Útiles</h2>
+                </div>
+                <div id="quick-links-wrapper" class="p-4"> 
+                    <div id="quick-links-container" class="space-y-2">
+                        <p class="text-sm text-gray-500" id="no-quick-links-message" style="display:none;">No hay enlaces útiles configurados.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card comments-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-comments mr-2 text-green-500"></i>Comentarios Rápidos</h3>
+                </div>
+                <div class="p-4">
+                    <textarea id="quick-comment-textarea" placeholder="Escribe tu comentario, sugerencia o idea aquí..."></textarea>
+                    <button id="submit-comment-btn"><i class="fas fa-paper-plane"></i> Enviar Comentario</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="text-center mt-12 py-4 text-sm text-gray-300">
+         <p id="user-email-footer-display" class="text-xs"></p> 
+    </footer>
+
+    <a id="help-chat-link" href="#" target="_blank" class="help-chat-bubble" title="Ayuda / Chat">
+        <i class="fas fa-comment-dots"></i> Ayuda
+    </a>
+
+    <script>
+        let masterFeaturesData = [];
+        let masterUserStoriesData = [];
+        let masterDependenciesData = [];
+        let masterAnnouncementsData = []; 
+        let masterQuickLinksData = []; 
+        let appConfig = {}; 
+        let masterPodiumData = [];
+        const DEFAULT_TEAM_MOOD_EMOJI = "😊"; 
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+
+        function showLoading(message = "Cargando datos...") {
+            if (loadingOverlay) {
+                if(loadingMessage) loadingMessage.innerHTML = message; 
+                const spinner = loadingOverlay.querySelector('.spinner');
+                if(spinner) spinner.style.display = 'inline-block'; 
+                loadingOverlay.style.display = 'flex'; 
+            }
+        }
+        function hideLoading() {
+            if (loadingOverlay) loadingOverlay.style.display = 'none'; 
+        }
+        function displayErrorOnOverlay(htmlErrorMessage) {
+            if (loadingOverlay && loadingMessage) {
+                loadingMessage.innerHTML = htmlErrorMessage; 
+                const spinner = loadingOverlay.querySelector('.spinner');
+                if(spinner) spinner.style.display = 'none'; 
+                loadingOverlay.style.display = 'flex'; 
+            }
+        }
+        function getStatusBadge(status) {
+            const statusStr = String(status || '').trim().toLowerCase();
+            switch (statusStr) {
+                case 'new': return 'badge-gray';
+                case 'deployed': return 'badge-green';
+                case 'blocked': return 'badge-red';
+                case 'discarded': return 'badge-orange';
+                default: return 'badge-blue'; 
+            }
+        }
+        function getProgressBarColorGeneral(percentage) {
+            if (percentage >= 100) return 'bg-green-500';
+            if (percentage > 50) return 'bg-blue-500';
+            if (percentage > 0) return 'bg-yellow-500';
+            return 'bg-gray-300';
+        }
+        function applyFiltersAndRender() {
+            const selectedResponsible = document.getElementById('global-responsible-filter').value;
+            const selectedStatus = document.getElementById('global-status-filter').value;
+            renderFeatures(selectedResponsible, selectedStatus);
+            renderUserStories(selectedResponsible, selectedStatus);
+            renderDependencies(selectedResponsible, selectedStatus);
+            renderPodium(selectedResponsible);
+        }
+        function updateGeneralProgress(sectionPrefix, filteredData) {
+            const percentageElement = document.getElementById(`${sectionPrefix}-progress-percentage`);
+            const barElement = document.getElementById(`${sectionPrefix}-progress-bar`);
+            if (!percentageElement || !barElement) return;
+            const totalItems = filteredData.length;
+            const deployedItems = filteredData.filter(item => String(item.Status).trim().toLowerCase() === 'deployed').length;
+            const percentage = totalItems > 0 ? Math.round((deployedItems / totalItems) * 100) : 0;
+            percentageElement.textContent = `${percentage}%`;
+            barElement.style.width = `${percentage}%`;
+            barElement.className = `general-progress-bar-fill ${getProgressBarColorGeneral(percentage)}`;
+        }
+        function renderFeatures(filterResponsible, filterStatus) {
+            const listElement = document.getElementById('features-q-list');
+            const counterElement = document.getElementById('features-counter');
+            if (!listElement || !counterElement) return; 
+            let filteredData = masterFeaturesData; 
+            if (filterResponsible !== 'all') filteredData = filteredData.filter(f => f.Responsible === filterResponsible);
+            if (filterStatus !== 'all') filteredData = filteredData.filter(f => f.Status === filterStatus);
+            filteredData.sort((a, b) => (Number(a.StatusOrder) || 999) - (Number(b.StatusOrder) || 999));
+            updateGeneralProgress('features', filteredData);
+            listElement.innerHTML = filteredData.map(feature => {
+                const featureNameHtml = feature.URL ?
+                    `<a href="${feature.URL}" target="_blank" class="list-item-content-link" title="${feature.Name || ''}">${feature.Name || 'Feature sin nombre'} <i class="fas fa-external-link-alt"></i></a>` :
+                    `<span class="list-item-content" title="${feature.Name || ''}">${feature.Name || 'Feature sin nombre'}</span>`;
+                const userStoryCount = feature.userStoryCount || 0;
+                const dependencyCount = feature.dependencyCount || 0;
+                return `
+                    <li class="list-item">
+                        <div class="list-item-content-wrapper">
+                            ${featureNameHtml}
+                            <div class="list-item-responsible">${feature.Responsible || 'N/A'}</div>
+                            <div class="feature-item-meta">HU: ${userStoryCount} | Dep: ${dependencyCount}</div>
+                        </div>
+                        <span class="list-item-badge ${getStatusBadge(feature.Status)}">
+                            ${feature.Status || 'N/A'} ${String(feature.Status).trim().toLowerCase() === 'deployed' ? '<i class="fas fa-trophy ml-1 text-yellow-500"></i>' : ''}
+                        </span>
+                    </li>`;
+            }).join(''); 
+            if(filteredData.length === 0) listElement.innerHTML = '<li class="list-item text-gray-500 italic">No hay features que coincidan con los filtros.</li>';
+            const deployedCount = filteredData.filter(f => String(f.Status).trim().toLowerCase() === 'deployed').length;
+            counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
+        }
+        function renderUserStories(filterResponsible, filterStatus) {
+            const tbodyElement = document.getElementById('user-stories-table-body');
+            const counterElement = document.getElementById('user-stories-counter');
+            if (!tbodyElement || !counterElement) return;
+            let filteredData = masterUserStoriesData;
+            if (filterResponsible !== 'all') filteredData = filteredData.filter(us => us.Responsible === filterResponsible);
+            if (filterStatus !== 'all') filteredData = filteredData.filter(us => us.Status === filterStatus);
+            filteredData.sort((a, b) => (Number(a.StatusOrder) || 999) - (Number(b.StatusOrder) || 999));
+            updateGeneralProgress('user-stories', filteredData);
+            tbodyElement.innerHTML = filteredData.map(story => `
+                <tr>
+                    <td class="col-story" title="${story.Name || ''}">${story.Name || 'Historia sin nombre'}</td>
+                    <td class="col-status"><span class="list-item-badge ${getStatusBadge(story.Status)}">${story.Status || 'N/A'}</span></td>
+                    <td class="col-seguimiento">${story.Responsible || 'N/A'}</td>
+                    <td class="col-enlace">
+                        ${story.JiraLink ? 
+                            `<a href="${story.JiraLink}" target="_blank">${story.ID ? String(story.ID).toUpperCase() : 'Ver Enlace'}</a>` : 
+                            (story.ID ? String(story.ID).toUpperCase() : 'N/A')}
+                    </td>
+                </tr>`).join('');
+            if(filteredData.length === 0) tbodyElement.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 italic py-4">No hay historias que coincidan.</td></tr>';
+            const deployedCount = filteredData.filter(us => String(us.Status).trim().toLowerCase() === 'deployed').length;
+            counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
+        }
+        function renderDependencies(filterResponsible, filterStatus) {
+            const listElement = document.getElementById('dependencies-list');
+            const counterElement = document.getElementById('dependencies-counter');
+            if (!listElement || !counterElement) return;
+            let filteredData = masterDependenciesData;
+            if (filterResponsible !== 'all') filteredData = filteredData.filter(d => d.Responsible === filterResponsible);
+            if (filterStatus !== 'all') filteredData = filteredData.filter(d => d.Status === filterStatus);
+            filteredData.sort((a, b) => {
+                if (typeof a.StatusOrder !== 'undefined' && typeof b.StatusOrder !== 'undefined' && !isNaN(Number(a.StatusOrder)) && !isNaN(Number(b.StatusOrder))) {
+                    return (Number(a.StatusOrder)) - (Number(b.StatusOrder));
+                }
+                const order = { "new": 1, "blocked": 2, "discarded": 3, "deployed": 4 };
+                return (order[String(a.Status || '').trim().toLowerCase()] || 50) - (order[String(b.Status || '').trim().toLowerCase()] || 50);
+            });
+            updateGeneralProgress('dependencies', filteredData);
+            listElement.innerHTML = filteredData.map(dependency => {
+                const dependencyNameHtml = dependency.URL ?
+                    `<a href="${dependency.URL}" target="_blank" class="list-item-content-link" title="${dependency.Name || ''}">${dependency.Name || 'Dependencia s.n.'} <i class="fas fa-external-link-alt"></i></a>` :
+                    `<span class="list-item-content" title="${dependency.Name || ''}">${dependency.Name || 'Dependencia s.n.'}</span>`;
+                return `
+                    <li class="list-item">
+                        <div class="list-item-content-wrapper">
+                            ${dependencyNameHtml}
+                            <div class="list-item-responsible">${dependency.Responsible || 'N/A'}</div>
+                        </div>
+                        <span class="list-item-badge ${getStatusBadge(dependency.Status)}">${dependency.Status || 'N/A'}</span>
+                    </li>`;
+            }).join('');
+            if(filteredData.length === 0) listElement.innerHTML = '<li class="list-item text-gray-500 italic">No hay dependencias que coincidan.</li>';
+            const deployedCount = filteredData.filter(d => String(d.Status).trim().toLowerCase() === 'deployed').length;
+            counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
+        }
+        function renderQuickLinks() {
+            const container = document.getElementById('quick-links-container');
+            const noLinksMessage = document.getElementById('no-quick-links-message');
+            const wrapper = document.getElementById('quick-links-wrapper'); 
+            if (!container || !noLinksMessage || !wrapper) return;
+            container.innerHTML = ''; 
+            if (!masterQuickLinksData || masterQuickLinksData.length === 0) {
+                if (noLinksMessage) noLinksMessage.style.display = 'block';
+                wrapper.style.maxHeight = ''; wrapper.style.overflowY = ''; return;
+            }
+            if (noLinksMessage) noLinksMessage.style.display = 'none'; 
+            masterQuickLinksData.sort((a,b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity) || (a.Text || "").localeCompare(b.Text || ""));
+            masterQuickLinksData.forEach(link => {
+                if (link.Text && link.URL) { 
+                    const iconHtml = link.Icon ? `<i class="${link.Icon}"></i>` : '<i class="fas fa-link"></i>'; 
+                    const linkElement = document.createElement('a');
+                    linkElement.href = link.URL; linkElement.target = "_blank"; 
+                    linkElement.className = "quick-link"; 
+                    linkElement.innerHTML = `${iconHtml} ${link.Text}`; 
+                    container.appendChild(linkElement); 
+                }
+            });
+        }
+        function renderPodium(filterResponsible = 'all') {
+            const podiumContainer = document.getElementById('podium-container');
+            if (!podiumContainer) return;
+            let displayData = masterPodiumData;
+            if (filterResponsible !== 'all') displayData = masterPodiumData.filter(p => p.responsible === filterResponsible);
+            podiumContainer.innerHTML = ''; 
+            if (!displayData || displayData.length === 0) {
+                podiumContainer.innerHTML = '<p class="text-sm text-gray-700 italic p-4">No hay datos para el podio.</p>'; return;
+            }
+            displayData.forEach(item => {
+                const podiumItem = document.createElement('div'); podiumItem.className = 'podium-item mb-3';
+                const nameAndPercentage = document.createElement('div'); nameAndPercentage.className = 'flex justify-between items-center mb-1';
+                const responsibleName = document.createElement('span'); responsibleName.className = 'podium-responsible-name text-sm'; responsibleName.textContent = item.responsible;
+                const progressPercentage = document.createElement('span'); progressPercentage.className = 'podium-progress-percentage text-sm'; progressPercentage.textContent = `${item.progress}%`;
+                nameAndPercentage.appendChild(responsibleName); nameAndPercentage.appendChild(progressPercentage);
+                const progressContainer = document.createElement('div'); progressContainer.className = 'podium-item progress-bar-container'; // Clase específica para podio
+                const progressBar = document.createElement('div'); progressBar.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; progressBar.style.width = `${item.progress}%`;
+                progressContainer.appendChild(progressBar);
+                podiumItem.appendChild(nameAndPercentage); podiumItem.appendChild(progressContainer);
+                podiumContainer.appendChild(podiumItem);
+            });
+        }
+        function populateFilters() { 
+            const responsibleFilter = document.getElementById('global-responsible-filter');
+            const statusFilter = document.getElementById('global-status-filter');
+            if (!responsibleFilter || !statusFilter) return;
+            while (responsibleFilter.options.length > 1) responsibleFilter.remove(1);
+            while (statusFilter.options.length > 1) statusFilter.remove(1);
+            const allData = [...masterFeaturesData, ...masterUserStoriesData, ...masterDependenciesData];
+            const allResponsibles = [...new Set(allData.map(item => item.Responsible))].filter(Boolean).sort();
+            allResponsibles.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; responsibleFilter.appendChild(o); });
+            const desiredStatusOrder = ["New", "Deployed", "Blocked", "Discarded"];
+            const uniqueStatuses = [...new Set(allData.map(item => String(item.Status || '').trim()))].filter(Boolean);
+            const sortedStatuses = uniqueStatuses.sort((a, b) => {
+                const aIndex = desiredStatusOrder.findIndex(s => s.toLowerCase() === a.toLowerCase());
+                const bIndex = desiredStatusOrder.findIndex(s => s.toLowerCase() === b.toLowerCase());
+                if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+                if (aIndex !== -1) return -1; if (bIndex !== -1) return 1;
+                return a.localeCompare(b);
+            });
+            sortedStatuses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; statusFilter.appendChild(o); });
+        }
+        function setupFilterListeners() {
+            document.getElementById('global-responsible-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('global-status-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('clear-filters-btn').addEventListener('click', () => {
+                document.getElementById('global-responsible-filter').value = 'all'; 
+                document.getElementById('global-status-filter').value = 'all'; 
+                applyFiltersAndRender(); 
+            });
+        }
+        function displayTeamMood(mood) {
+            const teamMoodEmojiDynamic = document.getElementById('team-mood-emoji-dynamic');
+            const teamMoodCard = document.getElementById('team-mood-display-card');
+            if (teamMoodEmojiDynamic && teamMoodCard) {
+                teamMoodEmojiDynamic.textContent = mood || DEFAULT_TEAM_MOOD_EMOJI;
+                teamMoodCard.style.display = 'block'; 
+            }
+        }
+        function updateSprintDetails() {
+            const sprintIdEl = document.getElementById('sprint-identifier-display');
+            const countdownEl = document.getElementById('sprint-countdown-display');
+            if (sprintIdEl && appConfig.SPRINT_INFO_YEAR && appConfig.SPRINT_INFO_QUARTER && appConfig.SPRINT_INFO_NUMBER_IN_QUARTER) {
+                sprintIdEl.textContent = `${appConfig.SPRINT_INFO_YEAR}-${appConfig.SPRINT_INFO_QUARTER}-S${appConfig.SPRINT_INFO_NUMBER_IN_QUARTER}`;
+            } else if (sprintIdEl) sprintIdEl.textContent = "No configurado";
+            if (!countdownEl || !appConfig.SPRINT_END_DATE) { if(countdownEl) countdownEl.innerHTML = "Fecha no configurada"; return; }
+            const sprintEndDate = new Date(appConfig.SPRINT_END_DATE);
+            if (isNaN(sprintEndDate.getTime())) { if(countdownEl) countdownEl.innerHTML = "Fecha inválida"; return; }
+            const timeLeft = sprintEndDate.getTime() - new Date().getTime(); 
+            if (timeLeft < 0) { countdownEl.innerHTML = "Sprint Finalizado"; return; }
+            const d = Math.floor(timeLeft/(1000*60*60*24)), h = Math.floor((timeLeft%(1000*60*60*24))/(1000*60*60));
+            const m = Math.floor((timeLeft%(1000*60*60))/(1000*60)), s = Math.floor((timeLeft%(1000*60))/1000);
+            countdownEl.innerHTML = `${d}d ${h}h ${m}m ${s}s`; 
+        }
+        function displayAnnouncements() {
+            const container = document.getElementById('announcements-container');
+            if (!container || !masterAnnouncementsData) return;
+            container.innerHTML = ''; 
+            let displayList = masterAnnouncementsData.filter(ann => ann.Show === true);
+            if (displayList.length === 0 && masterAnnouncementsData.length > 0) {
+                const activeAnns = masterAnnouncementsData.filter(ann => ann.Text);
+                if (activeAnns.length > 0) displayList.push(activeAnns[Math.floor(Math.random() * activeAnns.length)]);
+            }
+            if (displayList.length === 0) { container.style.display = 'none'; return; }
+            container.style.display = 'block';
+            displayList.forEach(ann => {
+                if (!ann.Text) return; 
+                const bubble = document.createElement('div'); bubble.className = 'announcement-bubble';
+                const contentDiv = document.createElement('div'); contentDiv.className = 'announcement-content';
+                contentDiv.innerHTML = ann.Link ? `<i class="fas fa-info-circle mr-2 text-blue-500"></i> <a href="${ann.Link}" target="_blank">${ann.Text}</a>` : `<i class="fas fa-info-circle mr-2 text-blue-500"></i> ${ann.Text}`;
+                const tagAndClose = document.createElement('div'); tagAndClose.className = 'announcement-tag-and-close';
+                const tagSpan = document.createElement('span'); tagSpan.className = 'tag';
+                if (ann.Tag && ann.TagClass) {
+                    tagSpan.textContent = ann.Tag;
+                    const predefinedBadges = ['badge-gray', 'badge-green', 'badge-red', 'badge-orange', 'badge-blue', 'badge-yellow', 'badge-purple', 'badge-teal', 'badge-pink'];
+                    if (predefinedBadges.includes(ann.TagClass)) tagSpan.classList.add(ann.TagClass);
+                    else tagSpan.classList.add('badge-blue'); 
+                    tagSpan.style.display = 'inline-block';
+                } else tagSpan.style.display = 'none'; 
+                const closeBtn = document.createElement('button'); closeBtn.className = 'announcement-close-btn'; closeBtn.setAttribute('aria-label', 'Cerrar'); closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = () => bubble.remove(); 
+                tagAndClose.appendChild(tagSpan); tagAndClose.appendChild(closeBtn);
+                bubble.appendChild(contentDiv); bubble.appendChild(tagAndClose);
+                container.appendChild(bubble);
+            });
+        }
+        function setupMoodSelector() {
+            const moodEmojis = document.querySelectorAll('#mood-selector .mood-emoji');
+            moodEmojis.forEach(emoji => {
+                if (emoji.dataset.default === "true") emoji.classList.add('selected');
+                emoji.addEventListener('click', () => {
+                    moodEmojis.forEach(e => e.classList.remove('selected')); 
+                    emoji.classList.add('selected'); 
+                    const selectedMood = emoji.dataset.mood; 
+                    const teamMoodCard = document.getElementById('team-mood-display-card');
+                    const teamMoodEmojiDynamic = document.getElementById('team-mood-emoji-dynamic');
+                    if (teamMoodEmojiDynamic) teamMoodEmojiDynamic.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                    if (teamMoodCard) teamMoodCard.style.display = 'block';
+                    google.script.run
+                        .withSuccessHandler(res => { if (res.success) displayTeamMood(res.newTeamMood || selectedMood); else if(teamMoodEmojiDynamic) teamMoodEmojiDynamic.textContent = 'Error'; })
+                        .withFailureHandler(err => { if(teamMoodEmojiDynamic) teamMoodEmojiDynamic.textContent = 'Error'; console.error("Fallo saveUserMood:", err);})
+                        .saveUserMood(selectedMood);
+                });
+            });
+        }
+        function setupQuickComments() {
+            const btn = document.getElementById('submit-comment-btn');
+            const area = document.getElementById('quick-comment-textarea');
+            if (btn && area) {
+                btn.addEventListener('click', () => {
+                    const comment = area.value.trim(); 
+                    if (comment) { 
+                        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...'; 
+                        google.script.run
+                            .withSuccessHandler(res => { if (res.success) area.value = ''; else alert("Error: " + res.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';})
+                            .withFailureHandler(err => { alert("Fallo: " + err.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';})
+                            .saveQuickComment(comment);
+                    }
+                });
+            }
+        }
+        function initializeDashboardWithData(dataFromServer) {
+            if (!dataFromServer || dataFromServer.error) {
+                const errorMsg = dataFromServer ? dataFromServer.error : "No se recibieron datos del servidor.";
+                displayErrorOnOverlay(`<div>Error: ${errorMsg}</div>`); console.error("Error init:", errorMsg); return; 
+            }
+            appConfig = dataFromServer.config || {};
+            document.getElementById('app-main-title').textContent = appConfig.APP_TITLE || 'Scrum App';
+            document.title = appConfig.APP_TITLE || 'Scrum App';
+            document.getElementById('help-chat-link').href = appConfig.HELP_CHAT_URL || '#';
+            document.getElementById('team-message-card-title').innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> ${appConfig.TEAM_MESSAGE_CARD_TITLE || 'Mensajes'}`;
+            document.getElementById('team-message-content').textContent = appConfig.TEAM_MESSAGE_CONTENT || 'No hay mensajes.';
+            masterFeaturesData = dataFromServer.features || [];
+            masterUserStoriesData = dataFromServer.userStories || [];
+            masterDependenciesData = dataFromServer.dependencies || [];
+            masterAnnouncementsData = dataFromServer.announcements || []; 
+            masterQuickLinksData = dataFromServer.quickLinks || []; 
+            masterPodiumData = dataFromServer.podiumData || [];
+            const userGreetingContainer = document.getElementById('user-greeting-container');
+            const userGreetingEmailSpan = document.getElementById('user-greeting-email');
+            if (dataFromServer.currentUserEmail) {
+                if (userGreetingEmailSpan) userGreetingEmailSpan.textContent = dataFromServer.currentUserEmail;
+                if (userGreetingContainer) userGreetingContainer.style.display = 'block'; 
+            } else if (userGreetingContainer) userGreetingContainer.style.display = 'none';
+            populateFilters(); applyFiltersAndRender(); renderQuickLinks(); 
+            updateSprintDetails(); setInterval(updateSprintDetails, 1000); 
+            displayAnnouncements(); 
+            hideLoading(); 
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoading("Cargando datos iniciales..."); 
+            google.script.run
+                .withSuccessHandler(initializeDashboardWithData) 
+                .withFailureHandler(err => { displayErrorOnOverlay(`Fallo crítico: ${err.message}`); console.error("Fallo getAllSheetData:", err);})
+                .getAllSheetData(); 
+            setupFilterListeners(); setupMoodSelector(); setupQuickComments();
+        });
+    </script>
+</body>
+</html>

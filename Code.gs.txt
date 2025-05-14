@@ -1,0 +1,291 @@
+const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI';
+
+const FEATURES_SHEET_NAME = 'Features';
+const USER_STORIES_SHEET_NAME = 'UserStories';
+const DEPENDENCIES_SHEET_NAME = 'Dependencies';
+const ANNOUNCEMENTS_SHEET_NAME = 'Announcements';
+const CONFIG_SHEET_NAME = 'Config';
+const MOODS_SHEET_NAME = 'Moods';
+const COMMENTS_SHEET_NAME = 'Comments';
+const QUICKLINKS_SHEET_NAME = 'QuickLinks';
+
+function doGet(e) {
+  return HtmlService.createTemplateFromFile('Index').evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+function getAllSheetData() {
+  let ss;
+  Logger.log(`Iniciando getAllSheetData para SPREADSHEET_ID: ${SPREADSHEET_ID}`);
+  try {
+    if (!SPREADSHEET_ID || SPREADSHEET_ID === 'TU_SPREADSHEET_ID_AQUI' || SPREADSHEET_ID.length < 20) {
+      const errMsg = `Error Crítico: SPREADSHEET_ID no está configurado o es inválido. ID actual: "${SPREADSHEET_ID}"`;
+      console.error(errMsg);
+      return { error: errMsg, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+    }
+    ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    if (!ss) {
+      const errMsg = `Error Crítico: No se pudo abrir Spreadsheet con ID: ${SPREADSHEET_ID}. Verifica ID, existencia y permisos.`;
+      console.error(errMsg);
+      return { error: errMsg, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+    }
+    Logger.log(`Spreadsheet "${ss.getName()}" abierto.`);
+
+    const getDataFromSheet = (sheetName, defaultValue = []) => {
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        Logger.log(`Advertencia: Hoja "${sheetName}" no encontrada. Usando valor por defecto.`);
+        return defaultValue;
+      }
+      return getSheetDataAsObjects(sheet, sheetName);
+    };
+    
+    const configSheet = ss.getSheetByName(CONFIG_SHEET_NAME);
+    const configSheetData = configSheet ? getSheetDataAsObjects(configSheet, CONFIG_SHEET_NAME) : [];
+    const config = {
+        APP_TITLE: 'Scrum App',
+        HELP_CHAT_URL: '#',
+        TEAM_MESSAGE_CARD_TITLE: 'Mensajes Importantes',
+        TEAM_MESSAGE_CONTENT: 'No hay mensajes configurados.',
+        COMMENT_NOTIFICATION_EMAIL: '' 
+    };
+
+    if (Array.isArray(configSheetData)) {
+      configSheetData.forEach(item => {
+        if (item && typeof item.Key !== 'undefined' && item.Value !== null && typeof item.Value !== 'undefined') {
+          let value = item.Value;
+          if (value instanceof Date) value = value.toISOString();
+          if (item.Key === 'SPRINT_INFO_YEAR' && (value === 25 || String(value).trim() === "25")) value = 2025;
+          if (item.Key === 'SPRINT_INFO_YEAR' || item.Key === 'SPRINT_INFO_NUMBER_IN_QUARTER') {
+            config[item.Key] = Number(value);
+          } else {
+            config[item.Key] = value;
+          }
+        }
+      });
+    }
+    Logger.log(`Configuración: ${JSON.stringify(config)}`);
+    
+    let allAnnouncements = getDataFromSheet(ANNOUNCEMENTS_SHEET_NAME, []);
+    let announcementsToClient = [];
+    const prioritizedAnnouncements = allAnnouncements.filter(ann => ann.Show === true);
+
+    if (prioritizedAnnouncements.length > 0) {
+        announcementsToClient = prioritizedAnnouncements;
+    } else {
+        announcementsToClient = allAnnouncements; 
+    }
+    
+    const quickLinksData = getDataFromSheet(QUICKLINKS_SHEET_NAME, []);
+    let featuresData = getDataFromSheet(FEATURES_SHEET_NAME, []);
+    const userStoriesData = getDataFromSheet(USER_STORIES_SHEET_NAME, []);
+    const dependenciesData = getDataFromSheet(DEPENDENCIES_SHEET_NAME, []);
+
+    if (featuresData.length > 0) {
+        featuresData = featuresData.map(feature => {
+            const featureIdStr = String(feature.ID);
+            const associatedUserStories = userStoriesData.filter(us => String(us.FeatureID) === featureIdStr);
+            const associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr); 
+            return { ...feature, userStoryCount: associatedUserStories.length, dependencyCount: associatedDependencies.length };
+        });
+    }
+
+    const podiumData = [];
+    if (featuresData.length > 0) {
+        const responsibles = [...new Set(featuresData.map(f => f.Responsible).filter(Boolean))];
+        responsibles.forEach(responsible => {
+            const responsibleFeatures = featuresData.filter(f => f.Responsible === responsible);
+            const totalFeatures = responsibleFeatures.length;
+            if (totalFeatures > 0) {
+                const deployedFeatures = responsibleFeatures.filter(f => String(f.Status).trim().toLowerCase() === 'deployed').length;
+                podiumData.push({ responsible: responsible, progress: Math.round((deployedFeatures / totalFeatures) * 100) });
+            }
+        });
+        podiumData.sort((a, b) => b.progress - a.progress);
+    }
+
+    const dataToReturn = {
+      error: null, features: featuresData, userStories: userStoriesData, dependencies: dependenciesData,
+      announcements: announcementsToClient, config: config, quickLinks: quickLinksData,
+      currentUserEmail: getActiveUserEmailSafely(), podiumData: podiumData
+    };
+    
+    return dataToReturn;
+
+  } catch (error) {
+    Logger.log(`Error en getAllSheetData: ${error.toString()} ${error.stack}`);
+    return { error: `Error en getAllSheetData: ${error.toString()}`, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+  }
+}
+
+function getActiveUserEmailSafely() {
+  try {
+    return Session.getActiveUser() ? Session.getActiveUser().getEmail() : null;
+  } catch (e) {
+    Logger.log("No se pudo obtener email: " + e.toString());
+    return null;
+  }
+}
+
+function getTeamMood() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const moodSheet = ss.getSheetByName(MOODS_SHEET_NAME);
+    if (!moodSheet || moodSheet.getLastRow() < 2) {
+      Logger.log("Hoja de Moods no encontrada o vacía.");
+      return "😊";
+    }
+
+    const data = moodSheet.getRange(2, 1, moodSheet.getLastRow() - 1, 3).getValues();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
+    const todaysMoods = data.filter(row => {
+      const timestamp = new Date(row[0]);
+      timestamp.setHours(0,0,0,0);
+      return timestamp.getTime() === today.getTime() && row[2]; 
+    });
+
+    if (todaysMoods.length === 0) {
+      Logger.log("No hay moods para hoy.");
+      return "😊"; 
+    }
+
+    const moodCounts = todaysMoods.reduce((acc, row) => {
+      const mood = row[2];
+      acc[mood] = (acc[mood] || 0) + 1;
+      return acc;
+    }, {});
+
+    let mostFrequentMood = "😊";
+    let maxCount = 0;
+    for (const mood in moodCounts) {
+      if (moodCounts[mood] > maxCount) {
+        mostFrequentMood = mood;
+        maxCount = moodCounts[mood];
+      }
+    }
+    Logger.log(`Mood más frecuente de hoy: ${mostFrequentMood} (conteo: ${maxCount})`);
+    return mostFrequentMood;
+
+  } catch (error) {
+    Logger.log(`Error en getTeamMood: ${error.toString()}`);
+    return "😊"; 
+  }
+}
+
+function saveUserMood(moodEmoji) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const moodSheet = ss.getSheetByName(MOODS_SHEET_NAME);
+    if (!moodSheet) throw new Error(`Hoja '${MOODS_SHEET_NAME}' no encontrada.`);
+    
+    moodSheet.appendRow([new Date(), getActiveUserEmailSafely(), moodEmoji]);
+    Logger.log(`Mood guardado: ${moodEmoji}`);
+    const newTeamMood = getTeamMood(); 
+    return { success: true, message: 'Mood guardado.', newTeamMood: newTeamMood };
+  } catch (error) {
+    Logger.log(`Error en saveUserMood: ${error.toString()}`);
+    return { success: false, message: `Error al guardar mood: ${error.toString()}` };
+  }
+}
+
+function saveQuickComment(commentText) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const commentsSheet = ss.getSheetByName(COMMENTS_SHEET_NAME);
+    if (!commentsSheet) throw new Error(`Hoja '${COMMENTS_SHEET_NAME}' no encontrada.`);
+    
+    const userEmail = getActiveUserEmailSafely();
+    const timestamp = new Date();
+    commentsSheet.appendRow([timestamp, userEmail, commentText]);
+    Logger.log(`Comentario guardado por ${userEmail}`);
+
+    const configSheet = ss.getSheetByName(CONFIG_SHEET_NAME);
+    let notificationEmail = '';
+    if (configSheet) {
+        const configData = getSheetDataAsObjects(configSheet, CONFIG_SHEET_NAME);
+        const emailConfig = configData.find(item => item.Key === 'COMMENT_NOTIFICATION_EMAIL');
+        if (emailConfig && emailConfig.Value) {
+            notificationEmail = emailConfig.Value;
+        }
+    }
+
+    if (notificationEmail) {
+        try {
+            MailApp.sendEmail({
+                to: notificationEmail,
+                subject: `Nuevo Comentario en Scrum App de: ${userEmail || 'Usuario desconocido'}`,
+                body: `Se ha registrado un nuevo comentario:\n\n"${commentText}"\n\nPor: ${userEmail || 'N/A'}\nFecha: ${timestamp.toLocaleString()}`
+            });
+            Logger.log(`Notificación de comentario enviada a: ${notificationEmail}`);
+        } catch (e) {
+            Logger.log(`Error al enviar email de notificación de comentario: ${e.toString()}`);
+        }
+    } else {
+        Logger.log("Email de notificación de comentarios no configurado.");
+    }
+
+    return { success: true, message: 'Comentario guardado.' };
+  } catch (error) {
+    Logger.log(`Error en saveQuickComment: ${error.toString()}`);
+    return { success: false, message: `Error al guardar comentario: ${error.toString()}` };
+  }
+}
+
+function getSheetDataAsObjects(sheet, sheetName) { 
+  if (!sheet) return [];
+  const numRows = sheet.getLastRow();
+  if (numRows < 1) return []; 
+  const lastColumn = sheet.getLastColumn();
+  if (lastColumn === 0) return [];
+  
+  const values = sheet.getRange(1, 1, numRows, lastColumn).getValues();
+  if (values.length < 1) return []; 
+  
+  const headers = values[0].map(header => {
+    let pHeader = String(header || "").trim();
+    if (pHeader === "Status Order") pHeader = "StatusOrder";
+    else if (pHeader === "Jira Link") pHeader = "JiraLink";
+    else if (pHeader === "Feature ID") pHeader = "FeatureID";
+    else if (pHeader === "Tag Class") pHeader = "TagClass";
+    else if (pHeader === "Seguimiento") pHeader = "Responsible";
+    else if (pHeader === "Show" || pHeader === "Mostrar") pHeader = "Show"; 
+    else if (sheetName === ANNOUNCEMENTS_SHEET_NAME && pHeader === "Announcements: Text") pHeader = "Text";
+    
+    pHeader = pHeader.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s+/g, ''); 
+    return pHeader;
+  });
+  
+  const objects = [];
+  if (numRows < 2) return []; 
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const object = {};
+    let hasData = false; 
+    headers.forEach((header, index) => {
+      if (!header) return; 
+      let cellVal = row[index]; 
+      if (cellVal instanceof Date) cellVal = Utilities.formatDate(cellVal, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'");
+      if (cellVal !== "" && cellVal !== null && typeof cellVal !== 'undefined') hasData = true;
+      
+      if (header === 'Progress' || header === 'StatusOrder' || header === 'Order') { 
+        const numVal = parseFloat(cellVal);
+        object[header] = (cellVal !== "" && cellVal !== null && !isNaN(numVal)) ? numVal : null;
+      } else if (header === 'ID' || header === 'FeatureID') {
+        object[header] = (cellVal !== "" && cellVal !== null) ? String(cellVal).trim() : null;
+      } else if (header === 'Show') {
+        object[header] = (String(cellVal).trim().toLowerCase() === 'true' || cellVal === true);
+      } else {
+        object[header] = cellVal;
+      }
+    });
+    if (hasData) objects.push(object);
+  }
+  return objects;
+}
