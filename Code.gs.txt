@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI';
+const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI'; 
 
 const FEATURES_SHEET_NAME = 'Features';
 const USER_STORIES_SHEET_NAME = 'UserStories';
@@ -6,32 +6,70 @@ const DEPENDENCIES_SHEET_NAME = 'Dependencies';
 const ANNOUNCEMENTS_SHEET_NAME = 'Announcements';
 const CONFIG_SHEET_NAME = 'Config';
 const MOODS_SHEET_NAME = 'Moods';
-const COMMENTS_SHEET_NAME = 'Comments';
+const IMPEDIMENTS_SHEET_NAME = 'Impediments';
 const QUICKLINKS_SHEET_NAME = 'QuickLinks';
+const UPCOMING_EVENTS_SHEET_NAME = 'UpcomingEvents';
+const COMMUNICATIONS_SHEET_NAME = 'Comunicados'; 
 
+const APP_CONFIG_DEFAULTS = {
+  APP_TITLE: 'Scrum App',
+  APP_SUBTITLE: 'Panel de Seguimiento Ágil',
+  HELP_CHAT_URL: '#',
+  TEAM_MESSAGE_CARD_TITLE: 'Comunicados del Equipo', 
+  IMPEDIMENT_NOTIFICATION_EMAIL: '',
+  CALENDAR_ID_SHEET: UPCOMING_EVENTS_SHEET_NAME,
+  MAX_CALENDAR_EVENTS: 10,
+  TEAM_MOOD_DEFAULT_EMOJI: "😊"
+};
+
+/**
+ * Función principal que se ejecuta cuando se accede a la aplicación web.
+ * @param {Object} e - El objeto de evento.
+ * @return {HtmlOutput} El servicio HTML para renderizar la página.
+ */
 function doGet(e) {
   return HtmlService.createTemplateFromFile('Index').evaluate()
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
+/**
+ * Incluye el contenido de otro archivo HTML (para plantillas).
+ * @param {string} filename - El nombre del archivo HTML a incluir.
+ * @return {string} El contenido del archivo HTML.
+ */
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
+/**
+ * Obtiene todos los datos necesarios de las hojas de cálculo.
+ * @return {Object} Un objeto con todos los datos de la aplicación o un objeto de error.
+ */
 function getAllSheetData() {
   let ss;
   Logger.log(`Iniciando getAllSheetData para SPREADSHEET_ID: ${SPREADSHEET_ID}`);
+  const defaultReturnValue = {
+    error: null, features: [], announcements: [], config: { ...APP_CONFIG_DEFAULTS }, quickLinks: [],
+    impediments: [], currentUserEmail: getActiveUserEmailSafely(),
+    podiumDataFeatures: [], podiumDataUserStories: [], podiumDataDependencies: [],
+    availableQs: [], availableSprints: [],
+    allFeaturesForImpediments: [], nonDeployedUserStories: [], upcomingEvents: [],
+    communications: [] 
+  };
+
   try {
     if (!SPREADSHEET_ID || SPREADSHEET_ID === 'TU_SPREADSHEET_ID_AQUI' || SPREADSHEET_ID.length < 20) {
       const errMsg = `Error Crítico: SPREADSHEET_ID no está configurado o es inválido. ID actual: "${SPREADSHEET_ID}"`;
       console.error(errMsg);
-      return { error: errMsg, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+      Logger.log(errMsg);
+      return { ...defaultReturnValue, error: errMsg };
     }
     ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     if (!ss) {
       const errMsg = `Error Crítico: No se pudo abrir Spreadsheet con ID: ${SPREADSHEET_ID}. Verifica ID, existencia y permisos.`;
       console.error(errMsg);
-      return { error: errMsg, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+      Logger.log(errMsg);
+      return { ...defaultReturnValue, error: errMsg };
     }
     Logger.log(`Spreadsheet "${ss.getName()}" abierto.`);
 
@@ -43,16 +81,10 @@ function getAllSheetData() {
       }
       return getSheetDataAsObjects(sheet, sheetName);
     };
-    
+
     const configSheet = ss.getSheetByName(CONFIG_SHEET_NAME);
     const configSheetData = configSheet ? getSheetDataAsObjects(configSheet, CONFIG_SHEET_NAME) : [];
-    const config = {
-        APP_TITLE: 'Scrum App',
-        HELP_CHAT_URL: '#',
-        TEAM_MESSAGE_CARD_TITLE: 'Mensajes Importantes',
-        TEAM_MESSAGE_CONTENT: 'No hay mensajes configurados.',
-        COMMENT_NOTIFICATION_EMAIL: '' 
-    };
+    let config = { ...APP_CONFIG_DEFAULTS };
 
     if (Array.isArray(configSheetData)) {
       configSheetData.forEach(item => {
@@ -60,7 +92,8 @@ function getAllSheetData() {
           let value = item.Value;
           if (value instanceof Date) value = value.toISOString();
           if (item.Key === 'SPRINT_INFO_YEAR' && (value === 25 || String(value).trim() === "25")) value = 2025;
-          if (item.Key === 'SPRINT_INFO_YEAR' || item.Key === 'SPRINT_INFO_NUMBER_IN_QUARTER') {
+
+          if (item.Key === 'SPRINT_INFO_YEAR' || item.Key === 'SPRINT_INFO_NUMBER_IN_QUARTER' || item.Key === 'MAX_CALENDAR_EVENTS') {
             config[item.Key] = Number(value);
           } else {
             config[item.Key] = value;
@@ -68,60 +101,119 @@ function getAllSheetData() {
         }
       });
     }
-    Logger.log(`Configuración: ${JSON.stringify(config)}`);
-    
-    let allAnnouncements = getDataFromSheet(ANNOUNCEMENTS_SHEET_NAME, []);
-    let announcementsToClient = [];
-    const prioritizedAnnouncements = allAnnouncements.filter(ann => ann.Show === true);
-
-    if (prioritizedAnnouncements.length > 0) {
-        announcementsToClient = prioritizedAnnouncements;
-    } else {
-        announcementsToClient = allAnnouncements; 
+    if (typeof config.MAX_CALENDAR_EVENTS === 'undefined' || config.MAX_CALENDAR_EVENTS < 1) {
+      config.MAX_CALENDAR_EVENTS = 10;
     }
-    
+    Logger.log(`Configuración cargada: ${JSON.stringify(config)}`);
+
+    let allAnnouncements = getDataFromSheet(ANNOUNCEMENTS_SHEET_NAME, []);
+    let announcementsToClient = allAnnouncements.sort((a, b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity));
+
     const quickLinksData = getDataFromSheet(QUICKLINKS_SHEET_NAME, []);
     let featuresData = getDataFromSheet(FEATURES_SHEET_NAME, []);
     const userStoriesData = getDataFromSheet(USER_STORIES_SHEET_NAME, []);
     const dependenciesData = getDataFromSheet(DEPENDENCIES_SHEET_NAME, []);
+    const impedimentsData = getDataFromSheet(IMPEDIMENTS_SHEET_NAME, []);
+
+    let communicationsData = getDataFromSheet(COMMUNICATIONS_SHEET_NAME, []);
+    communicationsData = communicationsData
+        .filter(comm => comm.Message && String(comm.Message).trim() !== "") // Ya no filtra por 'Show'
+        .sort((a, b) => {
+            const dateA = a.Date ? new Date(a.Date) : new Date(0); 
+            const dateB = b.Date ? new Date(b.Date) : new Date(0);
+            return dateB.getTime() - dateA.getTime(); 
+        });
+    Logger.log(`Comunicados procesados: ${communicationsData.length}`);
+
+
+    const allFeaturesForImpediments = featuresData
+      .map(f => ({ ID: f.ID, Name: f.Name }))
+      .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+
+    const nonDeployedUserStories = userStoriesData
+      .filter(us => String(us.Status || '').trim().toLowerCase() !== 'deployed')
+      .map(us => ({ ID: us.ID, Name: us.Name, FeatureID: us.FeatureID }))
+      .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+
 
     if (featuresData.length > 0) {
-        featuresData = featuresData.map(feature => {
-            const featureIdStr = String(feature.ID);
-            const associatedUserStories = userStoriesData.filter(us => String(us.FeatureID) === featureIdStr);
-            const associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr); 
-            return { ...feature, userStoryCount: associatedUserStories.length, dependencyCount: associatedDependencies.length };
-        });
+      featuresData = featuresData.map(feature => {
+        const featureIdStr = String(feature.ID);
+        const associatedUserStories = userStoriesData.filter(us => String(us.FeatureID) === featureIdStr);
+        const associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr);
+        return {
+          ...feature,
+          userStories: associatedUserStories,
+          dependencies: associatedDependencies,
+          userStoryCount: associatedUserStories.length,
+          dependencyCount: associatedDependencies.length
+        };
+      });
     }
 
-    const podiumData = [];
-    if (featuresData.length > 0) {
-        const responsibles = [...new Set(featuresData.map(f => f.Responsible).filter(Boolean))];
+    const calculatePodium = (items) => {
+      const podium = [];
+      if (items && items.length > 0) {
+        const responsibles = [...new Set(items.map(item => item.Responsible).filter(Boolean))];
         responsibles.forEach(responsible => {
-            const responsibleFeatures = featuresData.filter(f => f.Responsible === responsible);
-            const totalFeatures = responsibleFeatures.length;
-            if (totalFeatures > 0) {
-                const deployedFeatures = responsibleFeatures.filter(f => String(f.Status).trim().toLowerCase() === 'deployed').length;
-                podiumData.push({ responsible: responsible, progress: Math.round((deployedFeatures / totalFeatures) * 100) });
-            }
+          const responsibleItems = items.filter(item => item.Responsible === responsible);
+          const totalItems = responsibleItems.length;
+          if (totalItems > 0) {
+            const deployedItems = responsibleItems.filter(item => String(item.Status).trim().toLowerCase() === 'deployed').length;
+            podium.push({ responsible: responsible, progress: Math.round((deployedItems / totalItems) * 100) });
+          }
         });
-        podiumData.sort((a, b) => b.progress - a.progress);
-    }
+        podium.sort((a, b) => b.progress - a.progress);
+      }
+      return podium;
+    };
+
+    const podiumDataFeatures = calculatePodium(featuresData);
+    const podiumDataUserStories = calculatePodium(userStoriesData);
+    const podiumDataDependencies = calculatePodium(dependenciesData);
+
+    const allQsList = [...new Set(featuresData.map(f => f.Q).filter(Boolean))].sort();
+    const allSprintsList = [...new Set(
+      [
+        ...userStoriesData.map(us => us.Sprint),
+        ...dependenciesData.map(dep => dep.Sprint)
+      ].filter(Boolean)
+    )].sort();
+
+    const upcomingEvents = getUpcomingEventsFromSheet(config.CALENDAR_ID_SHEET, config.MAX_CALENDAR_EVENTS);
 
     const dataToReturn = {
-      error: null, features: featuresData, userStories: userStoriesData, dependencies: dependenciesData,
-      announcements: announcementsToClient, config: config, quickLinks: quickLinksData,
-      currentUserEmail: getActiveUserEmailSafely(), podiumData: podiumData
+      error: null,
+      features: featuresData,
+      announcements: announcementsToClient,
+      config: config,
+      quickLinks: quickLinksData,
+      impediments: impedimentsData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp)),
+      currentUserEmail: getActiveUserEmailSafely(),
+      podiumDataFeatures: podiumDataFeatures,
+      podiumDataUserStories: podiumDataUserStories,
+      podiumDataDependencies: podiumDataDependencies,
+      availableQs: allQsList,
+      availableSprints: allSprintsList,
+      allFeaturesForImpediments: allFeaturesForImpediments,
+      nonDeployedUserStories: nonDeployedUserStories,
+      upcomingEvents: upcomingEvents,
+      communications: communicationsData 
     };
-    
+
     return dataToReturn;
 
   } catch (error) {
     Logger.log(`Error en getAllSheetData: ${error.toString()} ${error.stack}`);
-    return { error: `Error en getAllSheetData: ${error.toString()}`, features: [], userStories: [], dependencies: [], announcements: [], config: {}, quickLinks: [], currentUserEmail: getActiveUserEmailSafely(), podiumData: [] };
+    console.error(`Error en getAllSheetData: ${error.toString()} ${error.stack}`);
+    return { ...defaultReturnValue, error: `Error en getAllSheetData: ${error.toString()}` };
   }
 }
 
+/**
+ * Obtiene el email del usuario activo de forma segura.
+ * @return {string|null} El email del usuario o null si no se puede obtener.
+ */
 function getActiveUserEmailSafely() {
   try {
     return Session.getActiveUser() ? Session.getActiveUser().getEmail() : null;
@@ -131,28 +223,33 @@ function getActiveUserEmailSafely() {
   }
 }
 
+/**
+ * Obtiene el mood general del equipo para el día actual.
+ * @return {string} El emoji del mood más frecuente.
+ */
 function getTeamMood() {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const moodSheet = ss.getSheetByName(MOODS_SHEET_NAME);
     if (!moodSheet || moodSheet.getLastRow() < 2) {
       Logger.log("Hoja de Moods no encontrada o vacía.");
-      return "😊";
+      return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
     }
 
     const data = moodSheet.getRange(2, 1, moodSheet.getLastRow() - 1, 3).getValues();
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
 
     const todaysMoods = data.filter(row => {
+      if (!row[0] || !row[2]) return false;
       const timestamp = new Date(row[0]);
-      timestamp.setHours(0,0,0,0);
-      return timestamp.getTime() === today.getTime() && row[2]; 
+      timestamp.setHours(0, 0, 0, 0);
+      return timestamp.getTime() === today.getTime();
     });
 
     if (todaysMoods.length === 0) {
       Logger.log("No hay moods para hoy.");
-      return "😊"; 
+      return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
     }
 
     const moodCounts = todaysMoods.reduce((acc, row) => {
@@ -161,7 +258,7 @@ function getTeamMood() {
       return acc;
     }, {});
 
-    let mostFrequentMood = "😊";
+    let mostFrequentMood = APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
     let maxCount = 0;
     for (const mood in moodCounts) {
       if (moodCounts[mood] > maxCount) {
@@ -174,19 +271,24 @@ function getTeamMood() {
 
   } catch (error) {
     Logger.log(`Error en getTeamMood: ${error.toString()}`);
-    return "😊"; 
+    return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
   }
 }
 
+/**
+ * Guarda el mood del usuario.
+ * @param {string} moodEmoji - El emoji seleccionado por el usuario.
+ * @return {Object} Resultado de la operación.
+ */
 function saveUserMood(moodEmoji) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const moodSheet = ss.getSheetByName(MOODS_SHEET_NAME);
     if (!moodSheet) throw new Error(`Hoja '${MOODS_SHEET_NAME}' no encontrada.`);
-    
+
     moodSheet.appendRow([new Date(), getActiveUserEmailSafely(), moodEmoji]);
     Logger.log(`Mood guardado: ${moodEmoji}`);
-    const newTeamMood = getTeamMood(); 
+    const newTeamMood = getTeamMood();
     return { success: true, message: 'Mood guardado.', newTeamMood: newTeamMood };
   } catch (error) {
     Logger.log(`Error en saveUserMood: ${error.toString()}`);
@@ -194,59 +296,157 @@ function saveUserMood(moodEmoji) {
   }
 }
 
-function saveQuickComment(commentText) {
+/**
+ * Guarda un nuevo impedimento y notifica por email.
+ * @param {Object} impedimentData - Datos del impedimento (title, description, associatedFeatureID, associatedUserStoryID).
+ * @return {Object} Resultado de la operación.
+ */
+function saveImpediment(impedimentData) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const commentsSheet = ss.getSheetByName(COMMENTS_SHEET_NAME);
-    if (!commentsSheet) throw new Error(`Hoja '${COMMENTS_SHEET_NAME}' no encontrada.`);
-    
+    const impedimentsSheet = ss.getSheetByName(IMPEDIMENTS_SHEET_NAME);
+    if (!impedimentsSheet) throw new Error(`Hoja '${IMPEDIMENTS_SHEET_NAME}' no encontrada. Por favor, créala.`);
+
     const userEmail = getActiveUserEmailSafely();
     const timestamp = new Date();
-    commentsSheet.appendRow([timestamp, userEmail, commentText]);
-    Logger.log(`Comentario guardado por ${userEmail}`);
+    const status = "Nuevo";
+    const associatedFeatureID = impedimentData.associatedFeatureID || null;
+    const associatedUserStoryID = impedimentData.associatedUserStoryID || null;
+    const title = impedimentData.title;
+
+    impedimentsSheet.appendRow([
+      timestamp,
+      userEmail,
+      title,
+      impedimentData.description,
+      status,
+      associatedUserStoryID,
+      associatedFeatureID
+    ]);
+    Logger.log(`Impedimento guardado por ${userEmail}: "${title}", F: ${associatedFeatureID}, HU: ${associatedUserStoryID}`);
 
     const configSheet = ss.getSheetByName(CONFIG_SHEET_NAME);
-    let notificationEmail = '';
+    let notificationEmail = APP_CONFIG_DEFAULTS.IMPEDIMENT_NOTIFICATION_EMAIL;
     if (configSheet) {
-        const configData = getSheetDataAsObjects(configSheet, CONFIG_SHEET_NAME);
-        const emailConfig = configData.find(item => item.Key === 'COMMENT_NOTIFICATION_EMAIL');
-        if (emailConfig && emailConfig.Value) {
-            notificationEmail = emailConfig.Value;
-        }
+      const configData = getSheetDataAsObjects(configSheet, CONFIG_SHEET_NAME);
+      const emailConfig = configData.find(item => item.Key === 'IMPEDIMENT_NOTIFICATION_EMAIL');
+      if (emailConfig && emailConfig.Value) {
+        notificationEmail = emailConfig.Value;
+      }
     }
 
     if (notificationEmail) {
-        try {
-            MailApp.sendEmail({
-                to: notificationEmail,
-                subject: `Nuevo Comentario en Scrum App de: ${userEmail || 'Usuario desconocido'}`,
-                body: `Se ha registrado un nuevo comentario:\n\n"${commentText}"\n\nPor: ${userEmail || 'N/A'}\nFecha: ${timestamp.toLocaleString()}`
-            });
-            Logger.log(`Notificación de comentario enviada a: ${notificationEmail}`);
-        } catch (e) {
-            Logger.log(`Error al enviar email de notificación de comentario: ${e.toString()}`);
+      try {
+        let emailBody = `Se ha registrado un nuevo impedimento:\n\nTítulo (HU/Feature): ${title}\nDescripción: ${impedimentData.description}\n`;
+        if (associatedFeatureID) {
+          emailBody += `ID Feature Asociada: ${associatedFeatureID}\n`;
         }
+        if (associatedUserStoryID) {
+          emailBody += `ID Historia de Usuario Asociada: ${associatedUserStoryID}\n`;
+        }
+        emailBody += `\nPor: ${userEmail || 'N/A'}\nFecha: ${timestamp.toLocaleString()}\nEstado: ${status}`;
+
+        MailApp.sendEmail({
+          to: notificationEmail,
+          subject: `Impedimento: ${title}`,
+          body: emailBody
+        });
+        Logger.log(`Notificación de impedimento enviada a: ${notificationEmail}`);
+      } catch (e) {
+        Logger.log(`Error al enviar email de notificación de impedimento: ${e.toString()}`);
+      }
     } else {
-        Logger.log("Email de notificación de comentarios no configurado.");
+      Logger.log("Email de notificación de impedimentos no configurado en la hoja Config.");
     }
 
-    return { success: true, message: 'Comentario guardado.' };
+    const newImpediment = {
+      Timestamp: timestamp.toISOString(),
+      UserEmail: userEmail,
+      Title: title,
+      Description: impedimentData.description,
+      Status: status,
+      AssociatedUserStoryID: associatedUserStoryID,
+      AssociatedFeatureID: associatedFeatureID
+    };
+    return { success: true, message: 'Impedimento guardado.', impediment: newImpediment };
   } catch (error) {
-    Logger.log(`Error en saveQuickComment: ${error.toString()}`);
-    return { success: false, message: `Error al guardar comentario: ${error.toString()}` };
+    Logger.log(`Error en saveImpediment: ${error.toString()}`);
+    return { success: false, message: `Error al guardar impedimento: ${error.toString()}` };
   }
 }
 
-function getSheetDataAsObjects(sheet, sheetName) { 
+/**
+ * Obtiene los próximos eventos de una hoja de cálculo.
+ * @param {string} sheetName - El nombre de la hoja que contiene los eventos.
+ * @param {number} maxEvents - El número máximo de eventos a obtener.
+ * @return {Array} Una lista de objetos de evento.
+ */
+function getUpcomingEventsFromSheet(sheetName, maxEvents) {
+  if (!sheetName) {
+    Logger.log("Nombre de hoja para eventos no configurado. No se pueden obtener eventos.");
+    return [];
+  }
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const eventSheet = ss.getSheetByName(sheetName);
+    if (!eventSheet) {
+      Logger.log(`Hoja de eventos '${sheetName}' no encontrada.`);
+      return [];
+    }
+    const eventsData = getSheetDataAsObjects(eventSheet, sheetName);
+    const now = new Date();
+
+    const formattedEvents = eventsData
+      .filter(event => {
+        if (!event.StartDate) return false;
+        try {
+          const startDate = new Date(event.StartDate);
+          return startDate >= now;
+        } catch (e) {
+          Logger.log(`Fecha inválida para evento '${event.EventTitle || event.title}': ${event.StartDate}`);
+          return false;
+        }
+      })
+      .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate))
+      .slice(0, maxEvents)
+      .map(event => {
+        let startISO = event.StartDate;
+        let endISO = event.EndDate;
+        if (event.StartDate instanceof Date) startISO = event.StartDate.toISOString();
+        if (event.EndDate instanceof Date) endISO = event.EndDate.toISOString();
+
+        return {
+          title: event.EventTitle || event.title || 'Evento sin título',
+          start: startISO,
+          end: endISO,
+          fullday: event.AllDayEvent === true || String(event.AllDayEvent).toLowerCase() === 'true'
+        };
+      });
+    Logger.log(`Eventos obtenidos de la hoja '${sheetName}': ${formattedEvents.length}`);
+    return formattedEvents;
+  } catch (e) {
+    Logger.log(`Error al obtener eventos de la hoja '${sheetName}': ${e.toString()}`);
+    return [];
+  }
+}
+
+
+/**
+ * Convierte los datos de una hoja en un array de objetos.
+ * @param {SpreadsheetApp.Sheet} sheet - El objeto de la hoja de cálculo.
+ * @param {string} sheetName - El nombre de la hoja (para logging y mapeo específico).
+ * @return {Array<Object>} Un array de objetos representando las filas.
+ */
+function getSheetDataAsObjects(sheet, sheetName) {
   if (!sheet) return [];
   const numRows = sheet.getLastRow();
   if (numRows < 1) return []; 
   const lastColumn = sheet.getLastColumn();
   if (lastColumn === 0) return [];
-  
+
   const values = sheet.getRange(1, 1, numRows, lastColumn).getValues();
-  if (values.length < 1) return []; 
-  
+  if (values.length < 1) return [];
+
   const headers = values[0].map(header => {
     let pHeader = String(header || "").trim();
     if (pHeader === "Status Order") pHeader = "StatusOrder";
@@ -256,36 +456,110 @@ function getSheetDataAsObjects(sheet, sheetName) {
     else if (pHeader === "Seguimiento") pHeader = "Responsible";
     else if (pHeader === "Show" || pHeader === "Mostrar") pHeader = "Show"; 
     else if (sheetName === ANNOUNCEMENTS_SHEET_NAME && pHeader === "Announcements: Text") pHeader = "Text";
-    
-    pHeader = pHeader.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s+/g, ''); 
+    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "Text") pHeader = "Text"; 
+    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "URL") pHeader = "URL";   
+    else if (pHeader === "Favorite") pHeader = "Favorite";
+    else if (pHeader === "Q" || pHeader === "Quarter") pHeader = "Q";
+    else if (pHeader === "Sprint" || pHeader === "Sprint Number") pHeader = "Sprint";
+    else if (pHeader === "Priority") pHeader = "Priority";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "Title") pHeader = "Title";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "Description") pHeader = "Description";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "Status") pHeader = "Status";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "UserEmail") pHeader = "UserEmail";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "Timestamp") pHeader = "Timestamp";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "AssociatedUserStoryID") pHeader = "AssociatedUserStoryID";
+    else if (sheetName === IMPEDIMENTS_SHEET_NAME && pHeader === "AssociatedFeatureID") pHeader = "AssociatedFeatureID";
+    else if (sheetName === UPCOMING_EVENTS_SHEET_NAME && (pHeader === "Event Title" || pHeader === "Title")) pHeader = "EventTitle";
+    else if (sheetName === UPCOMING_EVENTS_SHEET_NAME && (pHeader === "Start Date" || pHeader === "StartDate")) pHeader = "StartDate";
+    else if (sheetName === UPCOMING_EVENTS_SHEET_NAME && (pHeader === "End Date" || pHeader === "EndDate")) pHeader = "EndDate";
+    else if (sheetName === UPCOMING_EVENTS_SHEET_NAME && (pHeader === "All Day Event" || pHeader === "AllDayEvent")) pHeader = "AllDayEvent";
+    else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "Fecha") pHeader = "Date";
+    else if (sheetName === COMMUNICATIONS_SHEET_NAME && (pHeader === "Comunicado" || pHeader === "Mensaje")) pHeader = "Message";
+    else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "URL") pHeader = "URL";
+    // No se necesita mapeo para "Mostrar" en Comunicados si se elimina la columna/lógica
+
+
+    pHeader = pHeader.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s+/g, '');
     return pHeader;
   });
-  
+
   const objects = [];
   if (numRows < 2) return []; 
 
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     const object = {};
-    let hasData = false; 
+    let hasData = false;
     headers.forEach((header, index) => {
       if (!header) return; 
-      let cellVal = row[index]; 
-      if (cellVal instanceof Date) cellVal = Utilities.formatDate(cellVal, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'");
+      let cellVal = row[index];
+
+      if (cellVal instanceof Date) {
+        if (((sheetName === IMPEDIMENTS_SHEET_NAME || sheetName === MOODS_SHEET_NAME) && header === 'Timestamp') ||
+            (sheetName === UPCOMING_EVENTS_SHEET_NAME && (header === 'StartDate' || header === 'EndDate')) ||
+            (sheetName === COMMUNICATIONS_SHEET_NAME && header === 'Date') 
+           ) {
+          object[header] = cellVal; 
+        } else { 
+          object[header] = Utilities.formatDate(cellVal, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'");
+        }
+      } else {
+        if ((sheetName === UPCOMING_EVENTS_SHEET_NAME && (header === 'StartDate' || header === 'EndDate') && cellVal) ||
+            (sheetName === COMMUNICATIONS_SHEET_NAME && header === 'Date' && cellVal)
+           ) {
+          try {
+            let parsedDate = new Date(cellVal);
+            if (isNaN(parsedDate.getTime())) { 
+              if (String(cellVal).includes('/')) {
+                  const parts = String(cellVal).split('/');
+                  if (parts.length === 3) {
+                      if (parseInt(parts[0], 10) <= 12 && parseInt(parts[1], 10) <=31) { 
+                          parsedDate = new Date(parts[2], parts[0] - 1, parts[1]);
+                      } else if (parseInt(parts[1], 10) <= 12 && parseInt(parts[0], 10) <=31) { 
+                         parsedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                      }
+                  }
+              }
+            }
+
+            if (isNaN(parsedDate.getTime())) {
+                Logger.log(`Fecha string inválida en ${sheetName}, header ${header}: ${cellVal}. Se mantiene como string.`);
+                object[header] = cellVal;
+            } else {
+                object[header] = parsedDate; 
+            }
+
+          } catch (e) {
+            Logger.log(`Error parseando fecha string en ${sheetName}, header ${header}: ${cellVal} - ${e}`);
+            object[header] = cellVal; 
+          }
+        } else {
+          object[header] = cellVal;
+        }
+      }
+
       if (cellVal !== "" && cellVal !== null && typeof cellVal !== 'undefined') hasData = true;
-      
-      if (header === 'Progress' || header === 'StatusOrder' || header === 'Order') { 
+
+      if (header === 'StatusOrder' || header === 'Order') {
         const numVal = parseFloat(cellVal);
         object[header] = (cellVal !== "" && cellVal !== null && !isNaN(numVal)) ? numVal : null;
-      } else if (header === 'ID' || header === 'FeatureID') {
+      } else if (header === 'ID' || header === 'FeatureID' || header === 'AssociatedUserStoryID' || header === 'AssociatedFeatureID') {
         object[header] = (cellVal !== "" && cellVal !== null) ? String(cellVal).trim() : null;
-      } else if (header === 'Show') {
+      } else if (header === 'Show' || header === 'Favorite' || header === 'AllDayEvent') {
+        // Para la hoja Comunicados, si la columna "Show" no existe, este 'if' no se cumplirá para ella.
+        // Si existe y quieres ignorarla para Comunicados, necesitarías una condición adicional:
+        // if ((header === 'Show' && sheetName !== COMMUNICATIONS_SHEET_NAME) || header === 'Favorite' || header === 'AllDayEvent')
         object[header] = (String(cellVal).trim().toLowerCase() === 'true' || cellVal === true);
-      } else {
-        object[header] = cellVal;
       }
     });
-    if (hasData) objects.push(object);
+    if (hasData) {
+      if (object.Timestamp instanceof Date) object.Timestamp = object.Timestamp.toISOString();
+      if (object.StartDate instanceof Date) object.StartDate = object.StartDate.toISOString();
+      if (object.EndDate instanceof Date) object.EndDate = object.EndDate.toISOString();
+      if (object.Date instanceof Date) object.Date = object.Date.toISOString(); 
+      
+      objects.push(object);
+    }
   }
   return objects;
 }

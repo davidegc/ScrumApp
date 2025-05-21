@@ -6,96 +6,205 @@
     <title id="app-browser-title">Scrum App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #374151; color: #f3f4f6; }
         .app-header { border-bottom: 1px solid #4b5563; padding-bottom: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .app-header-title { order: 1; width: 100%; text-align: center; margin-bottom: 0.5rem; }
-        .app-header-user-info { order: 2; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .user-greeting { font-size: 0.9rem; color: #d1d5db; margin-bottom: 0.25rem; }
+        .app-header-title-section { order: 1; flex-grow: 1; text-align: center; md:text-align:left; }
+        .app-header-user-section { order: 2; md:order-3; text-align: center; md:text-right; margin-top: 0.5rem; md:margin-top:0;}
+        .user-greeting { font-size: 0.9rem; color: #d1d5db; }
+        .team-mood-header { font-size: 0.8rem; color: #cbd5e1; margin-top: 2px;}
         @media (min-width: 768px) { 
-            .app-header { flex-wrap: nowrap; }
-            .app-header-title { order: 1; width: auto; text-align: left; margin-bottom: 0; margin-right: auto; }
-            .app-header-user-info { order: 2; width: auto; flex-direction: row; align-items: center; }
-            .user-greeting { margin-bottom: 0; margin-right: 1rem; }
+            .app-header-title-section { text-align: left; }
+            .app-header-user-section { text-align: right; }
         }
+
         .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; overflow: hidden; }
         .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
-        .card-header { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: space-between; align-items: center; }
-        .card-header h2, .card-header h3 { font-size: 1.125rem; font-weight: 600; color: #1f2937; }
-        .card-header .counter { font-size: 0.875rem; font-weight: 500; color: #4b5563; background-color: #e5e7eb; padding: 4px 8px; border-radius: 9999px; }
+        .card-header { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .card-header h2, .card-header h3 { font-size: 1.125rem; font-weight: 600; color: #1f2937; margin-right: auto; }
+        .card-header .counter { font-size: 0.875rem; font-weight: 500; color: #4b5563; background-color: #e5e7eb; padding: 4px 8px; border-radius: 9999px; margin-left: 10px; }
+        
+        .search-container { padding: 0px 20px 12px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+        .search-input-wrapper { position: relative; display: flex; align-items: center; }
+        .search-input-icon { position: absolute; left: 10px; color: #9ca3af; }
+        .search-input-card {
+            padding: 8px 10px 8px 35px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+            font-size: 0.875rem; 
+            color: #374151; 
+            background-color: #ffffff; 
+            width: 100%; 
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+        }
+        .search-input-card:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
         .general-progress-container { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; }
         .general-progress-bar-bg { background-color: #e5e7eb; border-radius: 9999px; height: 0.75rem; }
-        .general-progress-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out; } /* Color se aplica dinámicamente */
+        .general-progress-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out; }
         .general-progress-text { font-size: 0.75rem; font-weight: 500; color: #4b5563; }
+        
+        /* Announcements */
         .announcements-container { margin-bottom: 1rem; }
-        .announcement-bubble { background-color: #e0f2fe; border: 1px solid #bae6fd; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px; margin-bottom: 0.5rem; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
-        .announcement-content { flex-grow: 1; font-size: 0.875rem; color: #075985; margin-right: 10px; }
-        .announcement-content a { color: #0369a1; font-weight: 500; text-decoration: none; }
+        .announcement-bubble { 
+            padding: 16px 20px; 
+            border-radius: 8px; margin-bottom: 1rem; 
+            position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            display: flex; align-items: center; 
+            border-left-width: 5px; 
+            border-left-style: solid;
+            background-color: #fffbeb; 
+            border-color: #f59e0b;   
+            color: #b45309;         
+        }
+        .announcement-content { 
+            flex-grow: 1; font-size: 0.95rem; 
+            font-weight:500; margin-right: 10px; 
+            text-align: center;
+        }
+        .announcement-content a { font-weight: 600; text-decoration: none; color: #92400e; } 
         .announcement-content a:hover { text-decoration: underline; }
-        .announcement-tag-and-close { display: flex; align-items: center; flex-shrink: 0; }
-        .announcement-tag-and-close .tag { padding: 2px 6px; border-radius: 9999px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; margin-right: 8px; }
-        .announcement-close-btn { background: none; border: none; font-size: 1.25rem; color: #0ea5e9; cursor: pointer; padding: 0; line-height: 1; }
-        .announcement-close-btn:hover { color: #0284c7; }
+        .announcement-close-btn { 
+            background: none; border: none; font-size: 1.3rem; 
+            cursor: pointer; padding: 0; line-height: 1; color: #f59e0b; 
+            margin-left: auto;
+        }
+        .announcement-close-btn:hover { color: #b45309; }
+
+        .announcement-bubble.vibrating {
+            animation: vibrate-intermittent 4s ease-in-out infinite;
+        }
+
+        @keyframes vibrate-intermittent {
+            0% { transform: translateX(0); }
+            2% { transform: translateX(-2px); }
+            4% { transform: translateX(2px); }
+            6% { transform: translateX(-2px); }
+            8% { transform: translateX(2px); }
+            10% { transform: translateX(0); } 
+            100% { transform: translateX(0); }
+        }
+
+
         .filters-wrapper { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem; background-color: transparent; border-radius: 8px; align-items: flex-end; }
-        .filter-container { display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; min-width: 180px; }
+        .filter-container { display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; min-width: 150px; }
         .filter-container label { font-size: 0.875rem; font-weight: 500; color: #d1d5db; }
         .filter-container label i { margin-right: 4px; }
-        .filter-container select { padding: 6px 10px; border-radius: 6px; border: 1px solid #6b7280; background-color: #4b5563; color: #f3f4f6; font-size: 0.875rem; width: 100%; }
+        .filter-container select, .filter-container input[type="search"] { padding: 6px 10px; border-radius: 6px; border: 1px solid #6b7280; background-color: #4b5563; color: #f3f4f6; font-size: 0.875rem; width: 100%; }
         #clear-filters-btn { padding: 6px 12px; background-color: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease; height: 34px; flex-shrink: 0; }
         #clear-filters-btn:hover { background-color: #5a636e; }
         #clear-filters-btn i { margin-right: 4px; }
-        .scrollable-list-container { max-height: 300px; overflow-y: auto; padding-right: 5px; }
-        .list-item { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
-        .list-item:last-child { border-bottom: none; }
-        .list-item-content-wrapper { display: flex; flex-direction: column; flex-grow: 1; margin-right: 1rem; min-width: 0; }
-        .list-item-content, .list-item-content-link { color: #374151; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .list-item-content-link { color: #2563eb; text-decoration: none; }
-        .list-item-content-link:hover { text-decoration: underline; white-space: normal; }
-        .list-item-content-link .fa-external-link-alt { font-size: 0.7em; margin-left: 4px; opacity: 0.7; }
-        .list-item-responsible { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
-        .feature-item-meta { font-size: 0.70rem; color: #4b5563; margin-top: 3px; }
-        .list-item-badge { padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; flex-shrink: 0; white-space: nowrap; }
+
+        .features-table-container { background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto;}
+        .features-table { width: 100%; border-collapse: collapse; color: #1f2937; table-layout: fixed; }
+        .features-table th, .features-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.875rem; vertical-align: middle; word-break: break-word; }
+        .features-table th { background-color: #f9fafb; font-weight: 600; }
+        .col-uniform { width: 23.75%; } 
+        .col-expand { width: 5%; text-align: center; }
+
+        .feature-row td { background-color: #fdfdfe; }
+        .feature-row.even td { background-color: #f7f8f9; }
+        .feature-row:hover td { background-color: #eff6ff; }
+        .feature-expand-icon { cursor: pointer; color: #6b7280; transition: transform 0.2s ease-in-out; }
+        .feature-expand-icon.expanded { transform: rotate(90deg); }
+        .feature-details-row td { padding: 0; background-color: #ffffff; }
+        .feature-details-content { padding: 15px; border-top: 2px solid #60a5fa; }
+        .feature-details-content h4 { font-size: 0.95rem; font-weight: 600; color: #374151; margin-top: 0; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e0e0;}
+        
+        .nested-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
+        .nested-table th, .nested-table td { padding: 8px 10px; text-align: left; border: 1px solid #e5e7eb; font-size: 0.8rem; word-break: break-word; }
+        .nested-table th { background-color: #f3f4f6; font-weight: 500; }
+        
+        .nested-table td a { color: #2563eb; text-decoration: none; }
+        .nested-table td a:hover { text-decoration: underline; }
+        
+        .tags-column-content span { margin-right: 5px; margin-bottom: 3px; display: inline-block;}
+        .tag-priority { background-color: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 500;}
+
+        .list-item-badge { padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; flex-shrink: 0; white-space: nowrap; display:inline-block; }
         .badge-gray { background-color: #e5e7eb; color: #4b5563; }
         .badge-green { background-color: #dcfce7; color: #166534; }
-        .badge-red { background-color: #fee2e2; color: #991b1b; }
+        .badge-red { background-color: #fee2e2; color: #991b1b; } 
         .badge-orange { background-color: #ffedd5; color: #c2410c; }
         .badge-blue { background-color: #e0f2fe; color: #0c4a6e; }  
         .badge-yellow { background-color: #fef9c3; color: #713f12; } 
         .badge-purple { background-color: #f3e8ff; color: #581c87; } 
         .badge-teal { background-color: #ccfbf1; color: #0f766e; } 
         .badge-pink { background-color: #fce7f3; color: #9d174d; } 
-        #quick-links-wrapper { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+
+        #quick-links-wrapper { max-height: 300px; overflow-y: auto; padding-right: 5px; }
         .quick-link { display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; text-decoration: none; }
         .quick-link:last-child { margin-bottom: 0; }
         .quick-link:hover { background-color: #eff6ff; border-color: #dbeafe; color: #1d4ed8; }
-        .quick-link i { margin-right: 10px; color: #60a5fa; width: 20px; text-align: center; }
-        .quick-link:hover i { color: #3b82f6; }
+        .quick-link .fa-star { color: #fbbf24; } 
+        .quick-link .far.fa-star { color: #9ca3af; } 
+        .quick-link .link-text { flex-grow: 1; margin: 0 8px; }
+        .quick-link .fa-external-link-alt { color: #9ca3af; font-size: 0.8em; }
+        .quick-link:hover .fa-external-link-alt { color: #6b7280; }
+
+        /* Estilos para Comunicados */
+        #communications-list-wrapper { max-height: 280px; overflow-y: auto; padding-right: 5px; } /* Ajustar altura si es necesario */
+        .communication-item { padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; }
+        .communication-item:hover { background-color: #eff6ff; }
+        .communication-date { font-size: 0.75rem; color: #6b7280; margin-bottom: 4px; }
+        .communication-message-text { font-size: 0.9rem; color: #1f2937; display: flex; align-items: center; justify-content: space-between; }
+        .communication-message-text a { color: #2563eb; text-decoration: none; flex-grow: 1; }
+        .communication-message-text a:hover { text-decoration: underline; }
+        .communication-message-text .fa-external-link-alt { color: #9ca3af; font-size: 0.8em; margin-left: 8px; }
+        .communication-message-text a:hover .fa-external-link-alt { color: #6b7280; }
+
+
         .sprint-countdown-text { font-size: 1.5rem; font-weight: 700; color: #1f2937; line-height: 1.2; }
         .sprint-countdown-label { font-size: 0.875rem; color: #4b5563; }
         .sprint-info-card .card-header h3 { color: #1f2937; }
-        .user-stories-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .user-stories-table th, .user-stories-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #e5e7eb; color: #374151; vertical-align: middle; word-wrap: break-word; }
-        .user-stories-table th.col-story, .user-stories-table td.col-story { width: 45%; }
-        .user-stories-table th.col-status, .user-stories-table td.col-status { width: 20%; min-width: 100px; }
-        .user-stories-table th.col-seguimiento, .user-stories-table td.col-seguimiento { width: 20%; min-width: 100px; }
-        .user-stories-table th.col-enlace, .user-stories-table td.col-enlace { width: 15%; min-width: 90px; }
-        .user-stories-table th { background-color: #f9fafb; font-weight: 600; color: #1f2937; }
-        .user-stories-table td .list-item-badge { padding: 3px 8px; }
-        .user-stories-table a { color: #3b82f6; text-decoration: none; display: inline-flex; align-items: center; }
-        .user-stories-table a:hover { text-decoration: underline; }
+        
         .mood-emojis { display: flex; justify-content: space-around; align-items: center; padding: 10px 0; }
         .mood-emoji { font-size: 2rem; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.2s ease, background-color 0.2s ease; border: 2px solid transparent; color: #1f2937; }
         .mood-emoji:hover { transform: scale(1.15); }
         .mood-emoji.selected { transform: scale(1.2); border-color: #60a5fa; }
-        .team-mood-card-content { text-align: center; padding: 10px; font-size: 0.9rem; color: #4b5563;}
-        .team-mood-card-content i.fa-users { margin-right: 4px; color: #6b7280; }
-        .team-mood-card-content #team-mood-emoji-dynamic { font-size: 1.1rem; }
-        .comments-card textarea { width: 100%; min-height: 80px; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; margin-bottom: 0.75rem; font-size: 0.875rem; resize: vertical; color: #1f2937; background-color: #f9fafb; }
-        .comments-card textarea::placeholder { color: #6b7280; }
-        .comments-card button { padding: 8px 15px; background-color: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease; width: 100%; }
-        .comments-card button:hover { background-color: #2563eb; }
-        .comments-card button i { margin-right: 6px; }
+        #mood-save-feedback { font-size: 0.8rem; color: #10b981; text-align: center; margin-top: 5px; height: 1em; }
+        
+        #impediments-section label { color: #374151; }
+        #impediments-section input[type="text"], 
+        #impediments-section textarea,
+        #impediments-section select {
+            width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; 
+            font-size: 0.875rem; color: #1f2937; background-color: #f9fafb;
+            margin-bottom: 0.75rem;
+        }
+        #impediments-section select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            padding-right: 2.5rem; 
+        }
+        #impediments-section textarea { min-height: 80px; resize: vertical; }
+        #impediments-section button { 
+            padding: 10px 15px; background-color: #ef4444; color: white; border: none; 
+            border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; 
+            transition: background-color 0.2s ease; width: 100%; display: flex; align-items: center; justify-content: center;
+        }
+        #impediments-section button:hover { background-color: #dc2626; }
+        #impediments-section button i { margin-right: 8px; }
+        #impediments-list-container { max-height: 250px; overflow-y: auto; padding: 0; }
+        .impediment-item { padding: 10px 15px; border-bottom: 1px solid #e5e7eb; }
+        .impediment-item:last-child { border-bottom: none; }
+        .impediment-title { font-weight: 600; color: #1f2937; margin-bottom: 4px; }
+        .impediment-description { font-size: 0.85rem; color: #4b5563; margin-bottom: 6px; white-space: pre-wrap; }
+        .impediment-meta { font-size: 0.75rem; color: #6b7280; display: flex; justify-content: space-between; }
+
+        .event-item { padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
+        .event-item:last-child { border-bottom: none; }
+        .event-title { font-weight: 500; color: #1f2937; }
+        .event-dates { font-size: 0.8rem; color: #4b5563; }
+
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 1.2rem; z-index: 9999; text-align: center; padding: 20px; }
         #loading-overlay .spinner { font-size: 2.5rem; margin-bottom: 15px; }
         #loading-overlay p { word-break: break-word; }
@@ -104,10 +213,12 @@
         .help-chat-bubble { position: fixed; bottom: 20px; right: 20px; background-color: #2563eb; color: white; padding: 10px 15px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; transition: background-color 0.2s ease, transform 0.2s ease; z-index: 1000; text-decoration: none; }
         .help-chat-bubble:hover { background-color: #1d4ed8; transform: scale(1.05); }
         .help-chat-bubble i { margin-right: 8px; font-size: 1.2rem; }
+        
         .podium-item .progress-bar-container { margin-top: 2px; height: 10px; background-color: #e5e7eb; border-radius: 9999px; overflow:hidden; } 
         .podium-item .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out;}
         .podium-responsible-name { font-weight: 500; color: #374151; }
         .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: 8px; }
+        .scrollable-list-container { max-height: 220px; overflow-y: auto; padding-right: 5px; } 
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -118,23 +229,60 @@
     </div>
 
     <header class="app-header">
-        <div class="app-header-title">
+        <div class="app-header-title-section">
             <h1 id="app-main-title" class="text-2xl md:text-3xl font-bold text-gray-100">Scrum App</h1>
+            <p id="app-main-subtitle" class="text-md md:text-lg text-gray-400 mt-1" style="display: none;"></p>
         </div>
-        <div class="app-header-user-info">
+        <div class="app-header-user-section">
             <div id="user-greeting-container" class="user-greeting" style="display: none;">
                 Hola, <span id="user-greeting-email"></span>!
+            </div>
+            <div id="team-mood-header-container" class="team-mood-header" style="display: none;">
+                El Mood del equipo hoy es <span id="header-team-mood-emoji"></span>
             </div>
         </div>
     </header>
 
-    <div id="announcements-container" class="announcements-container">
+    <div id="announcements-container" class="announcements-container"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-trophy mr-2 text-yellow-500"></i>Podio Features</h2>
+            </div>
+            <div id="podium-features-container" class="p-4 space-y-3 scrollable-list-container">
+                <p id="no-podium-features-data-message" class="text-sm text-gray-700" style="display:none;">No hay datos para mostrar.</p>
+            </div>
+        </section>
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-medal mr-2 text-blue-500"></i>Podio Historias Usuario</h2>
+            </div>
+            <div id="podium-us-container" class="p-4 space-y-3 scrollable-list-container">
+                <p id="no-podium-us-data-message" class="text-sm text-gray-700" style="display:none;">No hay datos para mostrar.</p>
+            </div>
+        </section>
+        <section class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-link mr-2 text-green-500"></i>Podio Dependencias</h2>
+            </div>
+            <div id="podium-dependencies-container" class="p-4 space-y-3 scrollable-list-container">
+                <p id="no-podium-dependencies-data-message" class="text-sm text-gray-700" style="display:none;">No hay datos para mostrar.</p>
+            </div>
+        </section>
     </div>
+
 
     <div class="filters-wrapper">
         <div class="filter-container">
-            <label for="global-responsible-filter"><i class="fas fa-user-check"></i>Seguimiento:</label>
-            <select id="global-responsible-filter">
+            <label for="global-q-filter"><i class="fas fa-calendar-week"></i> Q:</label>
+            <select id="global-q-filter">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <div class="filter-container">
+            <label for="global-sprint-filter"><i class="fas fa-running"></i> Sprint:</label>
+            <select id="global-sprint-filter">
                 <option value="all">Todos</option>
             </select>
         </div>
@@ -144,87 +292,52 @@
                 <option value="all">Todos</option>
             </select>
         </div>
+        <div class="filter-container">
+            <label for="global-responsible-filter"><i class="fas fa-user-check"></i>Seguimiento:</label>
+            <select id="global-responsible-filter">
+                <option value="all">Todos</option>
+            </select>
+        </div>
         <button id="clear-filters-btn"><i class="fas fa-eraser"></i> Limpiar Filtros</button>
     </div>
 
-    <section class="card mb-6">
-        <div class="card-header">
-            <h2><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario</h2>
-            <span class="counter" id="user-stories-counter">Desplegadas: 0 de 0</span>
-        </div>
-        <div class="general-progress-container">
-            <div class="flex justify-between items-center mb-1">
-                <span class="general-progress-text">Progreso General</span>
-                <span id="user-stories-progress-percentage" class="general-progress-text">0%</span>
-            </div>
-            <div class="general-progress-bar-bg">
-                <div id="user-stories-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        <div class="scrollable-list-container overflow-x-auto"> 
-            <table class="user-stories-table">
-                <thead>
-                    <tr>
-                        <th class="col-story">Historia</th>
-                        <th class="col-status">Estatus</th>
-                        <th class="col-seguimiento">Seguimiento</th>
-                        <th class="col-enlace">Enlace</th>
-                    </tr>
-                </thead>
-                <tbody id="user-stories-table-body">
-                </tbody>
-            </table>
-        </div>
-    </section>
-
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
-            <section class="card">
-                <div class="card-header">
+            <section class="card p-0"> 
+                <div class="card-header"> 
                     <h2><i class="fas fa-rocket mr-2 text-purple-500"></i>Features</h2>
-                    <span class="counter" id="features-counter">Desplegadas: 0 de 0</span>
+                    <span class="counter ml-auto" id="features-counter">Desplegadas: 0 de 0</span>
+                </div>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-input-icon"></i>
+                        <input type="search" id="features-search-input" placeholder="Buscar en Features, HUs, Dependencias..." class="search-input-card">
+                    </div>
                 </div>
                 <div class="general-progress-container">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="general-progress-text">Progreso General</span>
+                        <span class="general-progress-text">Progreso General Features</span>
                         <span id="features-progress-percentage" class="general-progress-text">0%</span>
                     </div>
                     <div class="general-progress-bar-bg">
                         <div id="features-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
                     </div>
                 </div>
-                <div class="scrollable-list-container">
-                    <ul id="features-q-list">
-                    </ul>
-                </div>
-            </section>
-
-            <section class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-project-diagram mr-2 text-teal-500"></i>Dependencias</h2>
-                    <span class="counter" id="dependencies-counter">Desplegadas: 0 de 0</span>
-                </div>
-                 <div class="general-progress-container">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="general-progress-text">Progreso General</span>
-                        <span id="dependencies-progress-percentage" class="general-progress-text">0%</span>
-                    </div>
-                    <div class="general-progress-bar-bg">
-                        <div id="dependencies-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
-                    </div>
-                </div>
-                <div class="scrollable-list-container">
-                    <ul id="dependencies-list">
-                    </ul>
-                </div>
-            </section>
-
-            <section class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-trophy mr-2 text-yellow-600"></i>Podio del Q</h2>
-                </div>
-                <div id="podium-container" class="p-4 space-y-3 scrollable-list-container">
-                    <p id="no-podium-data-message" class="text-sm text-gray-700" style="display:none;">No hay datos para mostrar en el podio.</p>
+                <div id="features-table-main-container" class="features-table-container"> 
+                    <table class="features-table">
+                        <thead>
+                            <tr>
+                                <th class="col-uniform">Nombre</th>
+                                <th class="col-uniform">Seguimiento</th>
+                                <th class="col-uniform">ID</th>
+                                <th class="col-uniform">Etiquetas</th>
+                                <th class="col-expand"><span class="sr-only">Expandir</span></th>                        
+                            </tr>
+                        </thead>
+                        <tbody id="features-list-tbody">
+                            </tbody>
+                    </table>
+                    <p id="no-features-message" class="text-sm text-gray-600 italic p-4 text-center" style="display:none;">No hay features que coincidan con los filtros.</p>
                 </div>
             </section>
         </div>
@@ -236,18 +349,35 @@
                         <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Sprint: <span id="sprint-identifier-display">CARGANDO...</span>
                     </h3>
                 </div>
-                <div class="p-6 text-center">
+                <div id="sprint-countdown-wrapper" class="p-6 text-center"> 
                     <p class="sprint-countdown-text" id="sprint-countdown-display">-- : -- : -- : --</p>
-                    <p class="sprint-countdown-label">para finalizar</p>
+                    <p class="sprint-countdown-label" id="sprint-countdown-label-text">para finalizar</p>
+                </div>
+            </section>
+
+            <section class="card" id="upcoming-events-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-check mr-2 text-cyan-500"></i>Próximos Eventos</h3>
+                </div>
+                <div id="upcoming-events-container" class="p-4 space-y-2 scrollable-list-container" style="max-height: 200px;">
+                    <p id="no-upcoming-events-message" class="text-sm text-gray-500 italic">Cargando eventos...</p>
                 </div>
             </section>
 
             <section class="card" id="team-message-card">
                 <div class="card-header">
-                    <h3 id="team-message-card-title"><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Mensajes</h3>
+                    <h3 id="team-message-card-title"><i class="fas fa-bullhorn mr-2 text-indigo-500"></i>Comunicados del Equipo</h3>
                 </div>
-                <div class="p-4">
-                    <p id="team-message-content" class="text-sm text-gray-700 leading-relaxed">Cargando mensaje...</p>
+                <div class="search-container" style="padding-top: 12px;">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-input-icon"></i>
+                        <input type="search" id="communications-search-input" placeholder="Buscar comunicados..." class="search-input-card">
+                    </div>
+                </div>
+                <div id="communications-list-wrapper" class="p-4">
+                    <div id="communications-list-container" class="space-y-2">
+                        </div>
+                    <p id="no-communications-message" class="text-sm text-gray-600 italic mt-2" style="display:none;">No hay comunicados.</p>
                 </div>
             </section>
 
@@ -263,15 +393,7 @@
                         <span class="mood-emoji" data-mood="😄" title="Muy Feliz">😄</span>
                         <span class="mood-emoji" data-mood="🎉" title="¡Genial!">🎉</span>
                     </div>
-                </div>
-            </section>
-            
-            <section class="card" id="team-mood-display-card" style="display: none;">
-                 <div class="card-header">
-                    <h3><i class="fas fa-users mr-2 text-green-500"></i>Mood del Equipo (Hoy)</h3>
-                </div>
-                <div class="team-mood-card-content">
-                     <span id="team-mood-emoji-dynamic">😊</span>
+                    <div id="mood-save-feedback"></div>
                 </div>
             </section>
             
@@ -279,27 +401,56 @@
                 <div class="card-header">
                     <h2><i class="fas fa-link mr-2 text-green-500"></i>Enlaces Útiles</h2>
                 </div>
+                <div class="search-container" style="padding-top: 12px;">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-input-icon"></i>
+                        <input type="search" id="quick-links-search" placeholder="Buscar enlaces..." class="search-input-card">
+                    </div>
+                </div>
                 <div id="quick-links-wrapper" class="p-4"> 
                     <div id="quick-links-container" class="space-y-2">
-                        <p class="text-sm text-gray-500" id="no-quick-links-message" style="display:none;">No hay enlaces útiles configurados.</p>
-                    </div>
+                        </div>
+                    <p class="text-sm text-gray-500 mt-2" id="no-quick-links-message" style="display:none;">No hay enlaces útiles configurados.</p>
                 </div>
             </section>
 
-            <section class="card comments-card">
+            <section class="card" id="impediments-section">
                 <div class="card-header">
-                    <h3><i class="fas fa-comments mr-2 text-green-500"></i>Comentarios Rápidos</h3>
+                    <h3><i class="fas fa-traffic-light mr-2 text-red-500"></i>Registrar Impedimento</h3>
                 </div>
                 <div class="p-4">
-                    <textarea id="quick-comment-textarea" placeholder="Escribe tu comentario, sugerencia o idea aquí..."></textarea>
-                    <button id="submit-comment-btn"><i class="fas fa-paper-plane"></i> Enviar Comentario</button>
+                    <div class="mb-3">
+                        <label for="impediment-feature-filter" class="block text-sm font-medium text-gray-700 mb-1">Feature Relacionada:</label>
+                        <select id="impediment-feature-filter" required>
+                            <option value="">Seleccionar Feature...</option>
+                            </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="impediment-us-filter" class="block text-sm font-medium text-gray-700 mb-1">Historia de Usuario:</label>
+                        <select id="impediment-us-filter" required disabled> 
+                            <option value="">Seleccionar HU relacionada...</option>
+                            </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="impediment-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada:</label>
+                        <textarea id="impediment-description" placeholder="Describe el impedimento, impacto y ayuda necesaria..." required></textarea>
+                    </div>
+                    <button id="submit-impediment-btn"><i class="fas fa-paper-plane"></i> Enviar Impedimento</button>
+                </div>
+                <div class="border-t mt-2">
+                    <div class="card-header">
+                            <h3><i class="fas fa-list-alt mr-2 text-gray-600"></i>Impedimentos Recientes</h3>
+                    </div>
+                    <div id="impediments-list-container" class="p-0"> 
+                        <p id="no-impediments-message" class="text-sm text-gray-500 italic p-4" style="display:none;">No hay impedimentos registrados.</p>
+                    </div>
                 </div>
             </section>
         </div>
     </main>
 
     <footer class="text-center mt-12 py-4 text-sm text-gray-300">
-         <p id="user-email-footer-display" class="text-xs"></p> 
+        <p id="user-email-footer-display" class="text-xs"></p> 
     </footer>
 
     <a id="help-chat-link" href="#" target="_blank" class="help-chat-bubble" title="Ayuda / Chat">
@@ -308,12 +459,21 @@
 
     <script>
         let masterFeaturesData = [];
-        let masterUserStoriesData = [];
-        let masterDependenciesData = [];
         let masterAnnouncementsData = []; 
         let masterQuickLinksData = []; 
+        let masterImpedimentsData = []; 
+        let allFeaturesForImpediments = []; 
+        let nonDeployedUserStoriesForImpediments = []; 
+        let upcomingEventsData = []; 
         let appConfig = {}; 
-        let masterPodiumData = [];
+        let masterPodiumDataFeatures = [];
+        let masterPodiumDataUserStories = [];
+        let masterPodiumDataDependencies = []; 
+        let availableQs = [];
+        let availableSprints = [];
+        let masterCommunicationsData = []; 
+
+
         const DEFAULT_TEAM_MOOD_EMOJI = "😊"; 
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingMessage = document.getElementById('loading-message');
@@ -342,25 +502,34 @@
             switch (statusStr) {
                 case 'new': return 'badge-gray';
                 case 'deployed': return 'badge-green';
-                case 'blocked': return 'badge-red';
+                case 'blocked': return 'badge-red'; 
                 case 'discarded': return 'badge-orange';
-                default: return 'badge-blue'; 
+                case 'in progress': return 'badge-blue'; 
+                case 'qa': return 'badge-teal'; 
+                default: return 'badge-purple'; 
             }
         }
         function getProgressBarColorGeneral(percentage) {
             if (percentage >= 100) return 'bg-green-500';
-            if (percentage > 50) return 'bg-blue-500';
-            if (percentage > 0) return 'bg-yellow-500';
+            if (percentage > 75) return 'bg-blue-500';
+            if (percentage > 25) return 'bg-yellow-500';
+            if (percentage > 0) return 'bg-orange-500';
             return 'bg-gray-300';
         }
+
         function applyFiltersAndRender() {
             const selectedResponsible = document.getElementById('global-responsible-filter').value;
             const selectedStatus = document.getElementById('global-status-filter').value;
-            renderFeatures(selectedResponsible, selectedStatus);
-            renderUserStories(selectedResponsible, selectedStatus);
-            renderDependencies(selectedResponsible, selectedStatus);
-            renderPodium(selectedResponsible);
+            const selectedQ = document.getElementById('global-q-filter').value;
+            const selectedSprint = document.getElementById('global-sprint-filter').value;
+            const featureSearchTerm = document.getElementById('features-search-input').value;
+            
+            renderFeatures(selectedResponsible, selectedStatus, selectedQ, selectedSprint, featureSearchTerm);
+            renderPodium(masterPodiumDataFeatures, 'podium-features-container', 'no-podium-features-data-message', selectedResponsible);
+            renderPodium(masterPodiumDataUserStories, 'podium-us-container', 'no-podium-us-data-message', selectedResponsible);
+            renderPodium(masterPodiumDataDependencies, 'podium-dependencies-container', 'no-podium-dependencies-data-message', selectedResponsible);
         }
+
         function updateGeneralProgress(sectionPrefix, filteredData) {
             const percentageElement = document.getElementById(`${sectionPrefix}-progress-percentage`);
             const barElement = document.getElementById(`${sectionPrefix}-progress-bar`);
@@ -372,149 +541,351 @@
             barElement.style.width = `${percentage}%`;
             barElement.className = `general-progress-bar-fill ${getProgressBarColorGeneral(percentage)}`;
         }
-        function renderFeatures(filterResponsible, filterStatus) {
-            const listElement = document.getElementById('features-q-list');
+
+        function toggleFeatureDetails(featureRowId, iconElement) {
+            const detailsRow = document.getElementById(`details-${featureRowId}`);
+            if (detailsRow) {
+                const isHidden = detailsRow.style.display === 'none' || detailsRow.style.display === '';
+                detailsRow.style.display = isHidden ? 'table-row' : 'none'; 
+                if (iconElement) {
+                    iconElement.classList.toggle('fa-chevron-right', !isHidden);
+                    iconElement.classList.toggle('fa-chevron-down', isHidden);
+                }
+            }
+        }
+        
+        function customSortItems(a, b) {
+            const statusA = String(a.Status || '').toLowerCase();
+            const statusB = String(b.Status || '').toLowerCase();
+            const nameA = String(a.Name || '').toLowerCase();
+            const nameB = String(b.Name || '').toLowerCase();
+
+            if (statusA === 'new' && statusB !== 'new') return -1;
+            if (statusA !== 'new' && statusB === 'new') return 1;
+            if (statusA === 'deployed' && statusB !== 'deployed') return 1;
+            if (statusA !== 'deployed' && statusB === 'deployed') return -1;
+            return nameA.localeCompare(nameB);
+        }
+
+        function renderFeatures(filterResponsible, filterStatus, filterQ, filterSprint, searchTerm = '') {
+            const tbody = document.getElementById('features-list-tbody');
             const counterElement = document.getElementById('features-counter');
-            if (!listElement || !counterElement) return; 
-            let filteredData = masterFeaturesData; 
-            if (filterResponsible !== 'all') filteredData = filteredData.filter(f => f.Responsible === filterResponsible);
-            if (filterStatus !== 'all') filteredData = filteredData.filter(f => f.Status === filterStatus);
-            filteredData.sort((a, b) => (Number(a.StatusOrder) || 999) - (Number(b.StatusOrder) || 999));
-            updateGeneralProgress('features', filteredData);
-            listElement.innerHTML = filteredData.map(feature => {
-                const featureNameHtml = feature.URL ?
-                    `<a href="${feature.URL}" target="_blank" class="list-item-content-link" title="${feature.Name || ''}">${feature.Name || 'Feature sin nombre'} <i class="fas fa-external-link-alt"></i></a>` :
-                    `<span class="list-item-content" title="${feature.Name || ''}">${feature.Name || 'Feature sin nombre'}</span>`;
-                const userStoryCount = feature.userStoryCount || 0;
-                const dependencyCount = feature.dependencyCount || 0;
-                return `
-                    <li class="list-item">
-                        <div class="list-item-content-wrapper">
-                            ${featureNameHtml}
-                            <div class="list-item-responsible">${feature.Responsible || 'N/A'}</div>
-                            <div class="feature-item-meta">HU: ${userStoryCount} | Dep: ${dependencyCount}</div>
-                        </div>
-                        <span class="list-item-badge ${getStatusBadge(feature.Status)}">
-                            ${feature.Status || 'N/A'} ${String(feature.Status).trim().toLowerCase() === 'deployed' ? '<i class="fas fa-trophy ml-1 text-yellow-500"></i>' : ''}
-                        </span>
-                    </li>`;
-            }).join(''); 
-            if(filteredData.length === 0) listElement.innerHTML = '<li class="list-item text-gray-500 italic">No hay features que coincidan con los filtros.</li>';
+            const noFeaturesMessage = document.getElementById('no-features-message');
+            if (!tbody || !counterElement || !noFeaturesMessage) return;
+
+            const lowerSearchTerm = searchTerm.toLowerCase();
+
+            let filteredData = masterFeaturesData.filter(feature => {
+                let responsibleMatch = (filterResponsible === 'all' || feature.Responsible === filterResponsible);
+                if (filterResponsible !== 'all' && feature.Responsible !== filterResponsible) { 
+                        responsibleMatch = (feature.userStories && feature.userStories.some(us => us.Responsible === filterResponsible)) ||
+                                        (feature.dependencies && feature.dependencies.some(dep => dep.Responsible === filterResponsible));
+                }
+                if (!responsibleMatch) return false;
+
+                if (filterStatus !== 'all') {
+                    let statusMatchFeature = (String(feature.Status || '').trim() === filterStatus);
+                    let statusMatchUserStory = false;
+                    if (feature.userStories && feature.userStories.length > 0) {
+                        statusMatchUserStory = feature.userStories.some(us => String(us.Status || '').trim() === filterStatus);
+                    }
+                    let statusMatchDependency = false;
+                    if (feature.dependencies && feature.dependencies.length > 0) {
+                        statusMatchDependency = feature.dependencies.some(dep => String(dep.Status || '').trim() === filterStatus);
+                    }
+                    if (!statusMatchFeature && !statusMatchUserStory && !statusMatchDependency) return false;
+                }
+                
+                if (filterQ !== 'all' && String(feature.Q) !== filterQ) return false;
+                
+                if (filterSprint !== 'all') {
+                    const hasMatchingSprintItem = 
+                        (feature.userStories && feature.userStories.some(us => String(us.Sprint) === filterSprint)) ||
+                        (feature.dependencies && feature.dependencies.some(dep => String(dep.Sprint) === filterSprint));
+                    if (!hasMatchingSprintItem) return false;
+                }
+
+                if (searchTerm) {
+                    const searchInText = (text) => text && String(text).toLowerCase().includes(lowerSearchTerm);
+                    let foundInFeature = searchInText(feature.Name) || searchInText(feature.Responsible) || searchInText(feature.ID) || 
+                                        searchInText(feature.Q) || searchInText(feature.Priority) || searchInText(feature.Status);
+                    if (foundInFeature) return true;
+
+                    const foundInUserStories = feature.userStories?.some(us => 
+                        searchInText(us.Name) || searchInText(us.Responsible) || searchInText(us.ID) || 
+                        searchInText(us.Sprint) || searchInText(us.Priority) || searchInText(us.Status)
+                    );
+                    if (foundInUserStories) return true;
+
+                    const foundInDependencies = feature.dependencies?.some(dep => 
+                        searchInText(dep.Name) || searchInText(dep.Responsible) || searchInText(dep.ID) || 
+                        searchInText(dep.Sprint) || searchInText(dep.Priority) || searchInText(dep.Status)
+                    );
+                    if (foundInDependencies) return true;
+                    
+                    return false; 
+                }
+                return true; 
+            });
+            
+            filteredData.sort(customSortItems);
+            updateGeneralProgress('features', filteredData); 
+            tbody.innerHTML = ''; 
+
+            if (filteredData.length === 0) {
+                noFeaturesMessage.style.display = 'table-row'; 
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 italic">${searchTerm ? 'Ninguna feature coincide con la búsqueda.' : 'No hay features que coincidan con los filtros.'}</td></tr>`;
+                counterElement.textContent = `Desplegadas: 0 de 0`;
+                return;
+            }
+            noFeaturesMessage.style.display = 'none';
+
+            filteredData.forEach((feature, index) => {
+                const featureRowId = `feature-row-${feature.ID || index}`;
+                
+                const featureNameDisplay = feature.Name || 'Feature sin nombre';
+                const featureIdDisplay = feature.URL ? 
+                    `<a href="${feature.URL}" target="_blank" class="text-blue-600 hover:underline">${feature.ID || 'N/A'}</a>` :
+                    (feature.ID || 'N/A');
+
+                const tagsHtml = `
+                    <div class="tags-column-content">
+                        <span class="list-item-badge ${getStatusBadge(feature.Status)}">${feature.Status || 'N/A'}</span>
+                        ${feature.Q ? `<span class="list-item-badge badge-purple">Q: ${feature.Q}</span>` : ''}
+                        ${feature.Priority ? `<span class="tag-priority">P: ${feature.Priority}</span>` : ''}
+                    </div>
+                `;
+
+                const featureRow = document.createElement('tr');
+                featureRow.className = `feature-row ${index % 2 === 0 ? 'even' : ''}`;
+                featureRow.innerHTML = `
+                    <td class="col-uniform">${featureNameDisplay}</td>
+                    <td class="col-uniform">${feature.Responsible || 'N/A'}</td>
+                    <td class="col-uniform">${featureIdDisplay}</td>
+                    <td class="col-uniform">${tagsHtml}</td>
+                    <td class="col-expand"><i class="fas fa-chevron-right feature-expand-icon" onclick="toggleFeatureDetails('${featureRowId}', this)"></i></td>
+                `;
+                tbody.appendChild(featureRow);
+
+                const detailsRow = document.createElement('tr');
+                detailsRow.id = `details-${featureRowId}`;
+                detailsRow.style.display = 'none'; 
+                const detailsCell = document.createElement('td');
+                detailsCell.colSpan = 5; 
+                detailsCell.className = 'feature-details-row';
+                
+                let userStoriesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Historias de Usuario asociadas.</td></tr>`;
+                if (feature.userStories && feature.userStories.length > 0) {
+                    const sortedUserStories = [...feature.userStories].sort(customSortItems);
+                    userStoriesHtml = sortedUserStories.map(us => {
+                        const usNameDisplay = us.Name || 'HU sin nombre';
+                        const usIdDisplay = us.JiraLink ? 
+                            `<a href="${us.JiraLink}" target="_blank" class="text-blue-600 hover:underline">${us.ID || 'N/A'}</a>` :
+                            (us.ID || 'N/A');
+                        const usTagsHtml = `
+                            <div class="tags-column-content">
+                                <span class="list-item-badge ${getStatusBadge(us.Status)}">${us.Status || 'N/A'}</span>
+                                ${us.Sprint ? `<span class="list-item-badge badge-teal">S: ${us.Sprint}</span>` : ''}
+                                ${us.Priority ? `<span class="tag-priority">P: ${us.Priority}</span>` : ''}
+                            </div>
+                        `;
+                        return `
+                        <tr>
+                            <td class="col-uniform">${usNameDisplay}</td>
+                            <td class="col-uniform">${us.Responsible || 'N/A'}</td>
+                            <td class="col-uniform">${usIdDisplay}</td>
+                            <td class="col-uniform">${usTagsHtml}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                let dependenciesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Dependencias asociadas.</td></tr>`;
+                if (feature.dependencies && feature.dependencies.length > 0) {
+                    const sortedDependencies = [...feature.dependencies].sort(customSortItems);
+                    dependenciesHtml = sortedDependencies.map(dep => {
+                        const depNameDisplay = dep.Name || 'Dependencia s.n.';
+                        const depIdDisplay = dep.URL ? 
+                            `<a href="${dep.URL}" target="_blank" class="text-blue-600 hover:underline">${dep.ID || 'N/A'}</a>` :
+                            (dep.ID || 'N/A');
+                        const depTagsHtml = `
+                            <div class="tags-column-content">
+                                <span class="list-item-badge ${getStatusBadge(dep.Status)}">${dep.Status || 'N/A'}</span>
+                                ${dep.Sprint ? `<span class="list-item-badge badge-pink">S: ${dep.Sprint}</span>` : ''}
+                                ${dep.Priority ? `<span class="tag-priority">P: ${dep.Priority}</span>` : ''}
+                            </div>
+                        `;
+                        return `
+                        <tr>
+                            <td class="col-uniform">${depNameDisplay}</td>
+                            <td class="col-uniform">${dep.Responsible || 'N/A'}</td>
+                            <td class="col-uniform">${depIdDisplay}</td>
+                            <td class="col-uniform">${depTagsHtml}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                detailsCell.innerHTML = `
+                    <div class="feature-details-content">
+                        <h4><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario (${feature.userStories?.length || 0})</h4>
+                        <table class="nested-table">
+                            <thead><tr><th class="col-uniform">Nombre</th><th class="col-uniform">Seguimiento</th><th class="col-uniform">ID</th><th class="col-uniform">Etiquetas</th></tr></thead>
+                            <tbody>${userStoriesHtml}</tbody>
+                        </table>
+                        <h4><i class="fas fa-project-diagram mr-2 text-teal-500"></i>Dependencias (${feature.dependencies?.length || 0})</h4>
+                        <table class="nested-table">
+                            <thead><tr><th class="col-uniform">Nombre</th><th class="col-uniform">Seguimiento</th><th class="col-uniform">ID</th><th class="col-uniform">Etiquetas</th></tr></thead>
+                            <tbody>${dependenciesHtml}</tbody>
+                        </table>
+                    </div>
+                `;
+                detailsRow.appendChild(detailsCell);
+                tbody.appendChild(detailsRow);
+            });
+            
             const deployedCount = filteredData.filter(f => String(f.Status).trim().toLowerCase() === 'deployed').length;
             counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
         }
-        function renderUserStories(filterResponsible, filterStatus) {
-            const tbodyElement = document.getElementById('user-stories-table-body');
-            const counterElement = document.getElementById('user-stories-counter');
-            if (!tbodyElement || !counterElement) return;
-            let filteredData = masterUserStoriesData;
-            if (filterResponsible !== 'all') filteredData = filteredData.filter(us => us.Responsible === filterResponsible);
-            if (filterStatus !== 'all') filteredData = filteredData.filter(us => us.Status === filterStatus);
-            filteredData.sort((a, b) => (Number(a.StatusOrder) || 999) - (Number(b.StatusOrder) || 999));
-            updateGeneralProgress('user-stories', filteredData);
-            tbodyElement.innerHTML = filteredData.map(story => `
-                <tr>
-                    <td class="col-story" title="${story.Name || ''}">${story.Name || 'Historia sin nombre'}</td>
-                    <td class="col-status"><span class="list-item-badge ${getStatusBadge(story.Status)}">${story.Status || 'N/A'}</span></td>
-                    <td class="col-seguimiento">${story.Responsible || 'N/A'}</td>
-                    <td class="col-enlace">
-                        ${story.JiraLink ? 
-                            `<a href="${story.JiraLink}" target="_blank">${story.ID ? String(story.ID).toUpperCase() : 'Ver Enlace'}</a>` : 
-                            (story.ID ? String(story.ID).toUpperCase() : 'N/A')}
-                    </td>
-                </tr>`).join('');
-            if(filteredData.length === 0) tbodyElement.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 italic py-4">No hay historias que coincidan.</td></tr>';
-            const deployedCount = filteredData.filter(us => String(us.Status).trim().toLowerCase() === 'deployed').length;
-            counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
-        }
-        function renderDependencies(filterResponsible, filterStatus) {
-            const listElement = document.getElementById('dependencies-list');
-            const counterElement = document.getElementById('dependencies-counter');
-            if (!listElement || !counterElement) return;
-            let filteredData = masterDependenciesData;
-            if (filterResponsible !== 'all') filteredData = filteredData.filter(d => d.Responsible === filterResponsible);
-            if (filterStatus !== 'all') filteredData = filteredData.filter(d => d.Status === filterStatus);
-            filteredData.sort((a, b) => {
-                if (typeof a.StatusOrder !== 'undefined' && typeof b.StatusOrder !== 'undefined' && !isNaN(Number(a.StatusOrder)) && !isNaN(Number(b.StatusOrder))) {
-                    return (Number(a.StatusOrder)) - (Number(b.StatusOrder));
-                }
-                const order = { "new": 1, "blocked": 2, "discarded": 3, "deployed": 4 };
-                return (order[String(a.Status || '').trim().toLowerCase()] || 50) - (order[String(b.Status || '').trim().toLowerCase()] || 50);
-            });
-            updateGeneralProgress('dependencies', filteredData);
-            listElement.innerHTML = filteredData.map(dependency => {
-                const dependencyNameHtml = dependency.URL ?
-                    `<a href="${dependency.URL}" target="_blank" class="list-item-content-link" title="${dependency.Name || ''}">${dependency.Name || 'Dependencia s.n.'} <i class="fas fa-external-link-alt"></i></a>` :
-                    `<span class="list-item-content" title="${dependency.Name || ''}">${dependency.Name || 'Dependencia s.n.'}</span>`;
-                return `
-                    <li class="list-item">
-                        <div class="list-item-content-wrapper">
-                            ${dependencyNameHtml}
-                            <div class="list-item-responsible">${dependency.Responsible || 'N/A'}</div>
-                        </div>
-                        <span class="list-item-badge ${getStatusBadge(dependency.Status)}">${dependency.Status || 'N/A'}</span>
-                    </li>`;
-            }).join('');
-            if(filteredData.length === 0) listElement.innerHTML = '<li class="list-item text-gray-500 italic">No hay dependencias que coincidan.</li>';
-            const deployedCount = filteredData.filter(d => String(d.Status).trim().toLowerCase() === 'deployed').length;
-            counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
-        }
+
+
         function renderQuickLinks() {
             const container = document.getElementById('quick-links-container');
             const noLinksMessage = document.getElementById('no-quick-links-message');
-            const wrapper = document.getElementById('quick-links-wrapper'); 
-            if (!container || !noLinksMessage || !wrapper) return;
-            container.innerHTML = ''; 
-            if (!masterQuickLinksData || masterQuickLinksData.length === 0) {
-                if (noLinksMessage) noLinksMessage.style.display = 'block';
-                wrapper.style.maxHeight = ''; wrapper.style.overflowY = ''; return;
+            const searchInput = document.getElementById('quick-links-search');
+
+            if (!searchInput) {
+                console.error("CRITICAL ERROR: Element with ID 'quick-links-search' NOT FOUND in renderQuickLinks!");
+                return; 
             }
-            if (noLinksMessage) noLinksMessage.style.display = 'none'; 
-            masterQuickLinksData.sort((a,b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity) || (a.Text || "").localeCompare(b.Text || ""));
-            masterQuickLinksData.forEach(link => {
-                if (link.Text && link.URL) { 
-                    const iconHtml = link.Icon ? `<i class="${link.Icon}"></i>` : '<i class="fas fa-link"></i>'; 
+            if (!container) {
+                console.error("CRITICAL ERROR: Element with ID 'quick-links-container' NOT FOUND in renderQuickLinks!");
+                return;
+            }
+            if (!noLinksMessage) {
+                console.error("CRITICAL ERROR: Element with ID 'no-quick-links-message' NOT FOUND in renderQuickLinks!");
+                return;
+            }
+
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let filteredLinks = masterQuickLinksData;
+
+            if (searchTerm) {
+                if (!Array.isArray(masterQuickLinksData)) { 
+                    console.error("Error: masterQuickLinksData is not an array in renderQuickLinks.");
+                    masterQuickLinksData = []; 
+                }
+                filteredLinks = masterQuickLinksData.filter(link => {
+                    const linkText = String(link.Text || '').toLowerCase();
+                    const linkUrl = String(link.URL || '').toLowerCase();
+                    return linkText.includes(searchTerm) || linkUrl.includes(searchTerm);
+                });
+            }
+            
+            if (Array.isArray(filteredLinks)) { 
+                filteredLinks.sort((a, b) => {
+                    if (a.Favorite === true && b.Favorite !== true) return -1;
+                    if (a.Favorite !== true && b.Favorite === true) return 1;
+                    return (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity) || 
+                           (String(a.Text || "")).localeCompare(String(b.Text || ""));
+                });
+            } else {
+                console.error("Error: filteredLinks is not an array before sorting.");
+                filteredLinks = []; 
+            }
+
+            container.innerHTML = ''; 
+            if (!filteredLinks || filteredLinks.length === 0) {
+                noLinksMessage.style.display = 'block';
+                noLinksMessage.textContent = searchTerm ? 'No hay enlaces que coincidan con la búsqueda.' : 'No hay enlaces útiles configurados.';
+                return;
+            }
+            
+            noLinksMessage.style.display = 'none'; 
+            filteredLinks.forEach(link => {
+                if (typeof link.Text !== 'undefined' && link.Text !== null && 
+                    typeof link.URL !== 'undefined' && link.URL !== null) { 
+                    const favoriteIcon = link.Favorite === true ? '<i class="fas fa-star mr-2"></i>' : '<i class="far fa-star mr-2"></i>';
                     const linkElement = document.createElement('a');
-                    linkElement.href = link.URL; linkElement.target = "_blank"; 
+                    linkElement.href = String(link.URL); 
+                    linkElement.target = "_blank"; 
                     linkElement.className = "quick-link"; 
-                    linkElement.innerHTML = `${iconHtml} ${link.Text}`; 
+                    linkElement.innerHTML = `${favoriteIcon} <span class="link-text">${String(link.Text)}</span> <i class="fas fa-external-link-alt"></i>`; 
                     container.appendChild(linkElement); 
                 }
             });
         }
-        function renderPodium(filterResponsible = 'all') {
-            const podiumContainer = document.getElementById('podium-container');
-            if (!podiumContainer) return;
-            let displayData = masterPodiumData;
-            if (filterResponsible !== 'all') displayData = masterPodiumData.filter(p => p.responsible === filterResponsible);
+        
+        function renderPodium(podiumData, containerId, noDataMessageId, filterResponsible = 'all') {
+            const podiumContainer = document.getElementById(containerId);
+            const noDataMsgElement = document.getElementById(noDataMessageId);
+            if (!podiumContainer || !noDataMsgElement) return;
+
+            let displayData = podiumData;
+            if (filterResponsible !== 'all') {
+                displayData = podiumData.filter(p => p.responsible === filterResponsible);
+            }
+            
             podiumContainer.innerHTML = ''; 
             if (!displayData || displayData.length === 0) {
-                podiumContainer.innerHTML = '<p class="text-sm text-gray-700 italic p-4">No hay datos para el podio.</p>'; return;
+                noDataMsgElement.style.display = 'block';
+                noDataMsgElement.textContent = filterResponsible !== 'all' ? 'No hay datos para este responsable.' : 'No hay datos para mostrar en el podio.';
+                return;
             }
+            noDataMsgElement.style.display = 'none';
+
             displayData.forEach(item => {
-                const podiumItem = document.createElement('div'); podiumItem.className = 'podium-item mb-3';
-                const nameAndPercentage = document.createElement('div'); nameAndPercentage.className = 'flex justify-between items-center mb-1';
-                const responsibleName = document.createElement('span'); responsibleName.className = 'podium-responsible-name text-sm'; responsibleName.textContent = item.responsible;
-                const progressPercentage = document.createElement('span'); progressPercentage.className = 'podium-progress-percentage text-sm'; progressPercentage.textContent = `${item.progress}%`;
-                nameAndPercentage.appendChild(responsibleName); nameAndPercentage.appendChild(progressPercentage);
-                const progressContainer = document.createElement('div'); progressContainer.className = 'podium-item progress-bar-container'; // Clase específica para podio
-                const progressBar = document.createElement('div'); progressBar.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; progressBar.style.width = `${item.progress}%`;
+                const podiumItem = document.createElement('div'); 
+                podiumItem.className = 'podium-item mb-3';
+                const nameAndPercentage = document.createElement('div'); 
+                nameAndPercentage.className = 'flex justify-between items-center mb-1';
+                const responsibleName = document.createElement('span'); 
+                responsibleName.className = 'podium-responsible-name text-sm'; 
+                responsibleName.textContent = item.responsible;
+                const progressPercentageElement = document.createElement('span'); 
+                progressPercentageElement.className = 'podium-progress-percentage text-sm'; 
+                progressPercentageElement.textContent = `${item.progress}%`;
+                nameAndPercentage.appendChild(responsibleName); 
+                nameAndPercentage.appendChild(progressPercentageElement);
+                
+                const progressContainer = document.createElement('div'); 
+                progressContainer.className = 'podium-item progress-bar-container';
+                const progressBar = document.createElement('div'); 
+                progressBar.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; 
+                progressBar.style.width = `${item.progress}%`;
                 progressContainer.appendChild(progressBar);
-                podiumItem.appendChild(nameAndPercentage); podiumItem.appendChild(progressContainer);
+                
+                podiumItem.appendChild(nameAndPercentage); 
+                podiumItem.appendChild(progressContainer);
                 podiumContainer.appendChild(podiumItem);
             });
         }
+
         function populateFilters() { 
             const responsibleFilter = document.getElementById('global-responsible-filter');
             const statusFilter = document.getElementById('global-status-filter');
-            if (!responsibleFilter || !statusFilter) return;
-            while (responsibleFilter.options.length > 1) responsibleFilter.remove(1);
-            while (statusFilter.options.length > 1) statusFilter.remove(1);
-            const allData = [...masterFeaturesData, ...masterUserStoriesData, ...masterDependenciesData];
-            const allResponsibles = [...new Set(allData.map(item => item.Responsible))].filter(Boolean).sort();
+            const qFilter = document.getElementById('global-q-filter');
+            const sprintFilter = document.getElementById('global-sprint-filter');
+
+            if (!responsibleFilter || !statusFilter || !qFilter || !sprintFilter) return;
+            
+            const clearOptions = (selectElement) => {
+                while (selectElement.options.length > 1) selectElement.remove(1);
+            };
+            clearOptions(responsibleFilter);
+            clearOptions(statusFilter);
+            clearOptions(qFilter);
+            clearOptions(sprintFilter);
+
+            let allItemsForFilters = [...masterFeaturesData];
+            masterFeaturesData.forEach(f => {
+                if (f.userStories) allItemsForFilters = allItemsForFilters.concat(f.userStories);
+                if (f.dependencies) allItemsForFilters = allItemsForFilters.concat(f.dependencies);
+            });
+
+            const allResponsibles = [...new Set(allItemsForFilters.map(item => item.Responsible))].filter(Boolean).sort();
             allResponsibles.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; responsibleFilter.appendChild(o); });
-            const desiredStatusOrder = ["New", "Deployed", "Blocked", "Discarded"];
-            const uniqueStatuses = [...new Set(allData.map(item => String(item.Status || '').trim()))].filter(Boolean);
+            
+            const desiredStatusOrder = ["New", "In Progress", "QA", "Deployed", "Blocked", "Discarded"]; 
+            const uniqueStatuses = [...new Set(allItemsForFilters.map(item => String(item.Status || '').trim()))].filter(Boolean);
             const sortedStatuses = uniqueStatuses.sort((a, b) => {
                 const aIndex = desiredStatusOrder.findIndex(s => s.toLowerCase() === a.toLowerCase());
                 const bIndex = desiredStatusOrder.findIndex(s => s.toLowerCase() === b.toLowerCase());
@@ -523,141 +894,523 @@
                 return a.localeCompare(b);
             });
             sortedStatuses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; statusFilter.appendChild(o); });
+
+            (availableQs || []).forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; qFilter.appendChild(o); });
+            (availableSprints || []).forEach(sprint => { const o = document.createElement('option'); o.value = sprint; o.textContent = sprint; sprintFilter.appendChild(o); });
         }
+
         function setupFilterListeners() {
             document.getElementById('global-responsible-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('global-status-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('global-q-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('global-sprint-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('clear-filters-btn').addEventListener('click', () => {
                 document.getElementById('global-responsible-filter').value = 'all'; 
                 document.getElementById('global-status-filter').value = 'all'; 
+                document.getElementById('global-q-filter').value = 'all'; 
+                document.getElementById('global-sprint-filter').value = 'all'; 
+                document.getElementById('features-search-input').value = ''; 
+                document.getElementById('communications-search-input').value = ''; 
                 applyFiltersAndRender(); 
+                renderTeamCommunications(); 
             });
+
+            const quickLinksSearchInput = document.getElementById('quick-links-search');
+            if (quickLinksSearchInput) {
+                quickLinksSearchInput.addEventListener('input', renderQuickLinks);
+            } else {
+                console.error("ERROR CRÍTICO: No se pudo encontrar el input 'quick-links-search' para añadir el listener.");
+            }
+            
+            const communicationsSearchInput = document.getElementById('communications-search-input');
+            if (communicationsSearchInput) {
+                communicationsSearchInput.addEventListener('input', () => renderTeamCommunications(communicationsSearchInput.value));
+            } else {
+                console.error("ERROR CRÍTICO: No se pudo encontrar el input 'communications-search-input' para añadir el listener.");
+            }
+
+            document.getElementById('features-search-input').addEventListener('input', applyFiltersAndRender); 
+            document.getElementById('impediment-feature-filter').addEventListener('change', populateImpedimentUserStoryFilter); 
         }
+        
         function displayTeamMood(mood) {
-            const teamMoodEmojiDynamic = document.getElementById('team-mood-emoji-dynamic');
-            const teamMoodCard = document.getElementById('team-mood-display-card');
-            if (teamMoodEmojiDynamic && teamMoodCard) {
-                teamMoodEmojiDynamic.textContent = mood || DEFAULT_TEAM_MOOD_EMOJI;
-                teamMoodCard.style.display = 'block'; 
+            const headerTeamMoodEmoji = document.getElementById('header-team-mood-emoji');
+            const teamMoodHeaderContainer = document.getElementById('team-mood-header-container');
+            if (headerTeamMoodEmoji && teamMoodHeaderContainer) {
+                headerTeamMoodEmoji.textContent = mood || DEFAULT_TEAM_MOOD_EMOJI;
+                teamMoodHeaderContainer.style.display = 'block';
             }
         }
+        
         function updateSprintDetails() {
             const sprintIdEl = document.getElementById('sprint-identifier-display');
+            const countdownWrapper = document.getElementById('sprint-countdown-wrapper'); 
             const countdownEl = document.getElementById('sprint-countdown-display');
-            if (sprintIdEl && appConfig.SPRINT_INFO_YEAR && appConfig.SPRINT_INFO_QUARTER && appConfig.SPRINT_INFO_NUMBER_IN_QUARTER) {
+            const countdownLabel = document.getElementById('sprint-countdown-label-text');
+
+            if (!sprintIdEl || !countdownWrapper || !countdownEl || !countdownLabel) return;
+
+            if (appConfig.SPRINT_INFO_YEAR && appConfig.SPRINT_INFO_QUARTER && appConfig.SPRINT_INFO_NUMBER_IN_QUARTER) {
                 sprintIdEl.textContent = `${appConfig.SPRINT_INFO_YEAR}-${appConfig.SPRINT_INFO_QUARTER}-S${appConfig.SPRINT_INFO_NUMBER_IN_QUARTER}`;
-            } else if (sprintIdEl) sprintIdEl.textContent = "No configurado";
-            if (!countdownEl || !appConfig.SPRINT_END_DATE) { if(countdownEl) countdownEl.innerHTML = "Fecha no configurada"; return; }
-            const sprintEndDate = new Date(appConfig.SPRINT_END_DATE);
-            if (isNaN(sprintEndDate.getTime())) { if(countdownEl) countdownEl.innerHTML = "Fecha inválida"; return; }
-            const timeLeft = sprintEndDate.getTime() - new Date().getTime(); 
-            if (timeLeft < 0) { countdownEl.innerHTML = "Sprint Finalizado"; return; }
+            } else {
+                sprintIdEl.textContent = "No configurado";
+            }
+            
+            if (!appConfig.SPRINT_END_DATE) { 
+                countdownWrapper.style.display = 'block'; 
+                countdownEl.innerHTML = "Fecha no configurada"; 
+                countdownLabel.style.display = 'none'; 
+                return; 
+            }
+
+            const sprintEndDateOriginal = new Date(appConfig.SPRINT_END_DATE);
+            if (isNaN(sprintEndDateOriginal.getTime())) { 
+                countdownWrapper.style.display = 'block';
+                countdownEl.innerHTML = "Fecha inválida"; 
+                countdownLabel.style.display = 'none';
+                return; 
+            }
+            
+            const sprintEndDate = new Date(
+                sprintEndDateOriginal.getFullYear(),
+                sprintEndDateOriginal.getMonth(),
+                sprintEndDateOriginal.getDate(),
+                23, 59, 59, 999 
+            );
+            
+            const now = new Date();
+            const timeLeft = sprintEndDate.getTime() - now.getTime(); 
+            
+            if (timeLeft < 0) { 
+                countdownWrapper.style.display = 'block'; 
+                countdownEl.innerHTML = "Sprint Finalizado"; 
+                countdownLabel.style.display = 'none'; 
+                return; 
+            }
+            countdownWrapper.style.display = 'block'; 
+            countdownLabel.style.display = 'block'; 
+
             const d = Math.floor(timeLeft/(1000*60*60*24)), h = Math.floor((timeLeft%(1000*60*60*24))/(1000*60*60));
             const m = Math.floor((timeLeft%(1000*60*60))/(1000*60)), s = Math.floor((timeLeft%(1000*60))/1000);
             countdownEl.innerHTML = `${d}d ${h}h ${m}m ${s}s`; 
         }
+
         function displayAnnouncements() {
             const container = document.getElementById('announcements-container');
             if (!container || !masterAnnouncementsData) return;
             container.innerHTML = ''; 
-            let displayList = masterAnnouncementsData.filter(ann => ann.Show === true);
-            if (displayList.length === 0 && masterAnnouncementsData.length > 0) {
-                const activeAnns = masterAnnouncementsData.filter(ann => ann.Text);
-                if (activeAnns.length > 0) displayList.push(activeAnns[Math.floor(Math.random() * activeAnns.length)]);
+
+            let displayList = masterAnnouncementsData.filter(ann => ann.Show === true && ann.Text && String(ann.Text).trim() !== "");
+            
+            displayList.sort((a,b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity));
+
+            if (displayList.length === 0) { 
+                container.style.display = 'none'; 
+                return; 
             }
-            if (displayList.length === 0) { container.style.display = 'none'; return; }
-            container.style.display = 'block';
+            container.style.display = 'block'; 
+
             displayList.forEach(ann => {
-                if (!ann.Text) return; 
-                const bubble = document.createElement('div'); bubble.className = 'announcement-bubble';
-                const contentDiv = document.createElement('div'); contentDiv.className = 'announcement-content';
-                contentDiv.innerHTML = ann.Link ? `<i class="fas fa-info-circle mr-2 text-blue-500"></i> <a href="${ann.Link}" target="_blank">${ann.Text}</a>` : `<i class="fas fa-info-circle mr-2 text-blue-500"></i> ${ann.Text}`;
-                const tagAndClose = document.createElement('div'); tagAndClose.className = 'announcement-tag-and-close';
-                const tagSpan = document.createElement('span'); tagSpan.className = 'tag';
-                if (ann.Tag && ann.TagClass) {
-                    tagSpan.textContent = ann.Tag;
-                    const predefinedBadges = ['badge-gray', 'badge-green', 'badge-red', 'badge-orange', 'badge-blue', 'badge-yellow', 'badge-purple', 'badge-teal', 'badge-pink'];
-                    if (predefinedBadges.includes(ann.TagClass)) tagSpan.classList.add(ann.TagClass);
-                    else tagSpan.classList.add('badge-blue'); 
-                    tagSpan.style.display = 'inline-block';
-                } else tagSpan.style.display = 'none'; 
-                const closeBtn = document.createElement('button'); closeBtn.className = 'announcement-close-btn'; closeBtn.setAttribute('aria-label', 'Cerrar'); closeBtn.innerHTML = '&times;';
+                const bubble = document.createElement('div');
+                bubble.className = `announcement-bubble vibrating`;
+                
+                const contentDiv = document.createElement('div'); 
+                contentDiv.className = 'announcement-content';
+                contentDiv.innerHTML = ann.Link ? `<i class="fas fa-bullhorn mr-2"></i> <a href="${ann.Link}" target="_blank">${ann.Text}</a>` : `<i class="fas fa-bullhorn mr-2"></i> ${ann.Text}`;
+                
+                const closeBtn = document.createElement('button'); 
+                closeBtn.className = 'announcement-close-btn'; 
+                closeBtn.setAttribute('aria-label', 'Cerrar'); 
+                closeBtn.innerHTML = '&times;';
                 closeBtn.onclick = () => bubble.remove(); 
-                tagAndClose.appendChild(tagSpan); tagAndClose.appendChild(closeBtn);
-                bubble.appendChild(contentDiv); bubble.appendChild(tagAndClose);
+                
+                bubble.appendChild(contentDiv); 
+                bubble.appendChild(closeBtn);
                 container.appendChild(bubble);
             });
         }
+
         function setupMoodSelector() {
             const moodEmojis = document.querySelectorAll('#mood-selector .mood-emoji');
+            const feedbackEl = document.getElementById('mood-save-feedback');
             moodEmojis.forEach(emoji => {
                 if (emoji.dataset.default === "true") emoji.classList.add('selected');
                 emoji.addEventListener('click', () => {
                     moodEmojis.forEach(e => e.classList.remove('selected')); 
                     emoji.classList.add('selected'); 
                     const selectedMood = emoji.dataset.mood; 
-                    const teamMoodCard = document.getElementById('team-mood-display-card');
-                    const teamMoodEmojiDynamic = document.getElementById('team-mood-emoji-dynamic');
-                    if (teamMoodEmojiDynamic) teamMoodEmojiDynamic.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-                    if (teamMoodCard) teamMoodCard.style.display = 'block';
+                    if(feedbackEl) feedbackEl.textContent = 'Guardando...';
                     google.script.run
-                        .withSuccessHandler(res => { if (res.success) displayTeamMood(res.newTeamMood || selectedMood); else if(teamMoodEmojiDynamic) teamMoodEmojiDynamic.textContent = 'Error'; })
-                        .withFailureHandler(err => { if(teamMoodEmojiDynamic) teamMoodEmojiDynamic.textContent = 'Error'; console.error("Fallo saveUserMood:", err);})
+                        .withSuccessHandler(res => { 
+                            if (res.success) {
+                                displayTeamMood(res.newTeamMood || selectedMood);
+                                if(feedbackEl) feedbackEl.textContent = '¡Guardado!';
+                                setTimeout(() => { if(feedbackEl) feedbackEl.textContent = ''; }, 2000);
+                            } else {
+                                if(feedbackEl) feedbackEl.textContent = 'Error.';
+                            }
+                        })
+                        .withFailureHandler(err => { 
+                            console.error("Fallo saveUserMood:", err);
+                            if(feedbackEl) feedbackEl.textContent = 'Error al guardar.';
+                        })
                         .saveUserMood(selectedMood);
                 });
             });
         }
-        function setupQuickComments() {
-            const btn = document.getElementById('submit-comment-btn');
-            const area = document.getElementById('quick-comment-textarea');
-            if (btn && area) {
+        
+        function renderImpediments() { 
+            const container = document.getElementById('impediments-list-container');
+            const noImpedimentsMessage = document.getElementById('no-impediments-message');
+            if (!container || !noImpedimentsMessage) return;
+
+            container.innerHTML = '';
+            if (!masterImpedimentsData || masterImpedimentsData.length === 0) {
+                noImpedimentsMessage.style.display = 'block';
+                return;
+            }
+            noImpedimentsMessage.style.display = 'none';
+
+            const impedimentsToDisplay = masterImpedimentsData.slice(0, 5); 
+
+            impedimentsToDisplay.forEach(impediment => {
+                const impedimentElement = document.createElement('div');
+                impedimentElement.className = 'impediment-item'; 
+                const date = impediment.Timestamp ? new Date(impediment.Timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : 'Fecha N/A';
+                const email = impediment.UserEmail ? impediment.UserEmail.split('@')[0] : 'N/A';
+                let associatedItemText = '';
+                if(impediment.AssociatedFeatureID) {
+                    const feature = allFeaturesForImpediments.find(f => String(f.ID) === String(impediment.AssociatedFeatureID));
+                    associatedItemText += ` (F: ${feature ? feature.Name : impediment.AssociatedFeatureID})`;
+                }
+                if(impediment.AssociatedUserStoryID) {
+                    const us = nonDeployedUserStoriesForImpediments.find(u => String(u.ID) === String(impediment.AssociatedUserStoryID));
+                    associatedItemText += ` (HU: ${us ? us.Name : impediment.AssociatedUserStoryID})`;
+                }
+
+                impedimentElement.innerHTML = `
+                    <div class="impediment-title">${impediment.Title || 'Sin Título'} ${associatedItemText}</div>
+                    <div class="impediment-description">${impediment.Description || 'Sin Descripción'}</div>
+                    <div class="impediment-meta">
+                        <span><i class="fas fa-user mr-1"></i> ${email}</span>
+                        <span><i class="fas fa-tag mr-1"></i> ${impediment.Status || 'N/A'}</span>
+                        <span><i class="fas fa-calendar-alt mr-1"></i> ${date}</span>
+                    </div>
+                `;
+                container.appendChild(impedimentElement);
+            });
+        }
+        
+        function populateImpedimentFeatureFilter() {
+            const featureSelect = document.getElementById('impediment-feature-filter');
+            if (!featureSelect) return;
+            featureSelect.innerHTML = '<option value="">Seleccionar Feature...</option>';
+            (allFeaturesForImpediments || []).forEach(feature => {
+                const option = document.createElement('option');
+                option.value = feature.ID;
+                option.textContent = `${feature.ID ? feature.ID + ': ' : ''}${feature.Name || 'Feature Sin Nombre'}`;
+                featureSelect.appendChild(option);
+            });
+            populateImpedimentUserStoryFilter(); 
+        }
+
+        function populateImpedimentUserStoryFilter() {
+            const featureSelect = document.getElementById('impediment-feature-filter');
+            const usSelect = document.getElementById('impediment-us-filter');
+            
+            if (!usSelect || !featureSelect ) return;
+
+            const selectedFeatureId = featureSelect.value;
+            usSelect.innerHTML = '<option value="">Seleccionar HU relacionada...</option>'; 
+            
+            if (selectedFeatureId) {
+                usSelect.disabled = false;
+                let storiesToShow = (nonDeployedUserStoriesForImpediments || []).filter(us => String(us.FeatureID) === selectedFeatureId);
+                storiesToShow.forEach(us => {
+                    const option = document.createElement('option');
+                    option.value = us.ID; 
+                    option.textContent = `${us.ID ? us.ID + ': ' : ''}${us.Name || 'HU Sin Nombre'}`;
+                    usSelect.appendChild(option);
+                });
+            } else {
+                usSelect.disabled = true; 
+            }
+        }
+        
+
+        function setupImpedimentSubmission() { 
+            const btn = document.getElementById('submit-impediment-btn');
+            const descriptionArea = document.getElementById('impediment-description');
+            const featureSelect = document.getElementById('impediment-feature-filter');
+            const usSelect = document.getElementById('impediment-us-filter');
+
+            if (btn && descriptionArea && usSelect && featureSelect) {
                 btn.addEventListener('click', () => {
-                    const comment = area.value.trim(); 
-                    if (comment) { 
-                        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...'; 
-                        google.script.run
-                            .withSuccessHandler(res => { if (res.success) area.value = ''; else alert("Error: " + res.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';})
-                            .withFailureHandler(err => { alert("Fallo: " + err.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';})
-                            .saveQuickComment(comment);
+                    const description = descriptionArea.value.trim();
+                    const selectedFeatureId = featureSelect.value;
+                    const selectedUserStoryId = usSelect.value; 
+                    
+                    let impedimentTitle = "Impedimento General"; 
+                    if (selectedUserStoryId) {
+                        const selectedUSOption = usSelect.options[usSelect.selectedIndex];
+                        if (selectedUSOption && selectedUSOption.textContent !== 'Seleccionar HU relacionada...') {
+                                const textParts = selectedUSOption.textContent.split(': ');
+                                impedimentTitle = textParts.length > 1 ? textParts.slice(1).join(': ') : selectedUSOption.textContent;
+                        }
+                    } else if (selectedFeatureId) { 
+                        const selectedFeatureOption = featureSelect.options[featureSelect.selectedIndex];
+                        if (selectedFeatureOption && selectedFeatureOption.textContent !== 'Seleccionar Feature...') {
+                            const textParts = selectedFeatureOption.textContent.split(': ');
+                            impedimentTitle = textParts.length > 1 ? textParts.slice(1).join(': ') : selectedFeatureOption.textContent;
+                        }
                     }
+
+                    if (!selectedFeatureId) {
+                        console.warn("Por favor, selecciona una Feature relacionada.");
+                        featureSelect.focus();
+                        return;
+                    }
+                    if (!selectedUserStoryId && (nonDeployedUserStoriesForImpediments || []).filter(us => String(us.FeatureID) === selectedFeatureId).length > 0) {
+                        console.warn("Por favor, selecciona una Historia de Usuario relacionada si hay disponibles.");
+                        usSelect.focus();
+                    }
+                    if (!description) {
+                        console.warn("Por favor, ingresa una descripción para el impedimento.");
+                        descriptionArea.focus();
+                        return;
+                    }
+
+                    btn.disabled = true; 
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...'; 
+                    
+                    const impedimentData = { 
+                        title: impedimentTitle, 
+                        description: description,
+                        associatedFeatureID: selectedFeatureId || null,
+                        associatedUserStoryID: selectedUserStoryId || null 
+                    };
+                    google.script.run
+                        .withSuccessHandler(res => { 
+                            if (res.success) {
+                                descriptionArea.value = '';
+                                populateImpedimentUserStoryFilter(); 
+                                usSelect.value = ""; 
+                                if (res.impediment) { 
+                                    masterImpedimentsData.unshift(res.impediment); 
+                                    renderImpediments(); 
+                                }
+                            } else {
+                                console.error("Error al registrar impedimento: " + res.message); 
+                            }
+                            btn.disabled = false; 
+                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Impedimento';
+                        })
+                        .withFailureHandler(err => { 
+                            console.error("Fallo al registrar impedimento: " + err.message); 
+                            btn.disabled = false; 
+                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Impedimento';
+                        })
+                        .saveImpediment(impedimentData); 
                 });
             }
         }
+
+        function renderUpcomingEvents() {
+            const container = document.getElementById('upcoming-events-container');
+            const noEventsMessage = document.getElementById('no-upcoming-events-message');
+            if (!container || !noEventsMessage) return;
+
+            container.innerHTML = ''; 
+
+            if (!upcomingEventsData || upcomingEventsData.length === 0) {
+                noEventsMessage.textContent = 'No hay eventos próximos o la hoja de eventos no está configurada.';
+                noEventsMessage.style.display = 'block';
+                return;
+            }
+            noEventsMessage.style.display = 'none';
+
+            upcomingEventsData.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                
+                let startDateStr = 'Fecha no disponible';
+                if (event.start) {
+                    try {
+                        const startDateObj = new Date(event.start);
+                        startDateStr = startDateObj.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
+                    } catch (e) { console.error("Error formatting start date: ", e); }
+                }
+
+                let endDateStr = '';
+                if (event.end) { 
+                    try {
+                        const dStart = new Date(event.start);
+                        const dEnd = new Date(event.end);
+                        
+                        if (dStart.toDateString() !== dEnd.toDateString()) {
+                            const adjustedEndDate = event.fullday ? new Date(dEnd.getTime() - (12*60*60*1000)) : dEnd; 
+                            if (adjustedEndDate >= dStart) { 
+                                endDateStr = ` - ${adjustedEndDate.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}`;
+                            }
+                        }
+                    } catch (e) { console.error("Error formatting end date: " + e); }
+                }
+
+                eventElement.innerHTML = `
+                    <div class="event-title">${event.title || 'Evento sin título'}</div>
+                    <div class="event-dates">${startDateStr}${endDateStr}</div>
+                `;
+                container.appendChild(eventElement);
+            });
+        }
+
+        function renderTeamCommunications(searchTerm = '') {
+            const listContainer = document.getElementById('communications-list-container');
+            const noCommsMessage = document.getElementById('no-communications-message');
+            const cardTitleElement = document.getElementById('team-message-card-title');
+            const searchInput = document.getElementById('communications-search-input'); // Necesario para obtener el término de búsqueda
+
+            if (!listContainer || !noCommsMessage || !searchInput) {
+                console.error("Elementos del DOM para comunicados no encontrados (listContainer, noCommsMessage, o searchInput).");
+                return;
+            }
+
+            if (cardTitleElement && appConfig.TEAM_MESSAGE_CARD_TITLE) {
+                cardTitleElement.innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> ${appConfig.TEAM_MESSAGE_CARD_TITLE}`;
+            } else if (cardTitleElement) { 
+                cardTitleElement.innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> Comunicados del Equipo`;
+            }
+            
+            const currentSearchTerm = searchInput.value.toLowerCase().trim(); // Usar el valor actual del input
+            let filteredComms = masterCommunicationsData;
+
+            if (currentSearchTerm) {
+                filteredComms = masterCommunicationsData.filter(comm => {
+                    const commDate = comm.Date ? new Date(comm.Date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).toLowerCase() : '';
+                    const commMessage = String(comm.Message || '').toLowerCase();
+                    const commUrl = String(comm.URL || '').toLowerCase();
+                    return commDate.includes(currentSearchTerm) || commMessage.includes(currentSearchTerm) || commUrl.includes(currentSearchTerm);
+                });
+            }
+
+            listContainer.innerHTML = ''; 
+
+            if (!filteredComms || filteredComms.length === 0) {
+                noCommsMessage.textContent = currentSearchTerm ? 'No hay comunicados que coincidan con la búsqueda.' : 'No hay comunicados recientes.';
+                noCommsMessage.style.display = 'block';
+                return;
+            }
+            
+            noCommsMessage.style.display = 'none';
+
+            filteredComms.forEach(comm => {
+                const commElement = document.createElement('div');
+                commElement.className = 'communication-item';
+
+                let dateHtml = '<p class="communication-date">Fecha no disponible</p>';
+                if (comm.Date) {
+                    try {
+                        const dateObj = new Date(comm.Date);
+                        const formattedDate = dateObj.toLocaleDateString('es-ES', {
+                            day: '2-digit', month: '2-digit', year: 'numeric' 
+                        });
+                        dateHtml = `<p class="communication-date">${formattedDate}</p>`;
+                    } catch (e) {
+                        console.error("Error formateando fecha del comunicado:", comm.Date, e);
+                    }
+                }
+
+                let messageText = comm.Message || "Mensaje no disponible.";
+                let messageContentHtml = '';
+
+                if (comm.URL) {
+                    messageContentHtml = `<a href="${comm.URL}" target="_blank">${messageText}</a> <i class="fas fa-external-link-alt"></i>`;
+                } else {
+                    messageContentHtml = messageText;
+                }
+                
+                commElement.innerHTML = `${dateHtml}<p class="communication-message-text">${messageContentHtml}</p>`;
+                listContainer.appendChild(commElement);
+            });
+        }
+
+
         function initializeDashboardWithData(dataFromServer) {
             if (!dataFromServer || dataFromServer.error) {
                 const errorMsg = dataFromServer ? dataFromServer.error : "No se recibieron datos del servidor.";
-                displayErrorOnOverlay(`<div>Error: ${errorMsg}</div>`); console.error("Error init:", errorMsg); return; 
+                displayErrorOnOverlay(`<div>Error: ${errorMsg}</div><p>Por favor, verifica la configuración de tu Spreadsheet ID y los nombres de las hojas (Features, UserStories, Dependencies, Config, Announcements, Moods, QuickLinks, Impediments, UpcomingEvents, Comunicados).</p>`); 
+                console.error("Error init:", errorMsg); return; 
             }
+            
             appConfig = dataFromServer.config || {};
             document.getElementById('app-main-title').textContent = appConfig.APP_TITLE || 'Scrum App';
             document.title = appConfig.APP_TITLE || 'Scrum App';
+
+            const subtitleElement = document.getElementById('app-main-subtitle');
+            if (appConfig.APP_SUBTITLE && subtitleElement) {
+                subtitleElement.textContent = appConfig.APP_SUBTITLE;
+                subtitleElement.style.display = 'block';
+            } else if (subtitleElement) {
+                subtitleElement.style.display = 'none';
+            }
+
             document.getElementById('help-chat-link').href = appConfig.HELP_CHAT_URL || '#';
-            document.getElementById('team-message-card-title').innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> ${appConfig.TEAM_MESSAGE_CARD_TITLE || 'Mensajes'}`;
-            document.getElementById('team-message-content').textContent = appConfig.TEAM_MESSAGE_CONTENT || 'No hay mensajes.';
+            
             masterFeaturesData = dataFromServer.features || [];
-            masterUserStoriesData = dataFromServer.userStories || [];
-            masterDependenciesData = dataFromServer.dependencies || [];
             masterAnnouncementsData = dataFromServer.announcements || []; 
             masterQuickLinksData = dataFromServer.quickLinks || []; 
-            masterPodiumData = dataFromServer.podiumData || [];
+            masterImpedimentsData = dataFromServer.impediments || []; 
+            allFeaturesForImpediments = dataFromServer.allFeaturesForImpediments || []; 
+            nonDeployedUserStoriesForImpediments = dataFromServer.nonDeployedUserStories || []; 
+            upcomingEventsData = dataFromServer.upcomingEvents || []; 
+            masterPodiumDataFeatures = dataFromServer.podiumDataFeatures || [];
+            masterPodiumDataUserStories = dataFromServer.podiumDataUserStories || [];
+            masterPodiumDataDependencies = dataFromServer.podiumDataDependencies || []; 
+            masterCommunicationsData = dataFromServer.communications || [];
+
+
+            availableQs = dataFromServer.availableQs || [];
+            availableSprints = dataFromServer.availableSprints || [];
+
             const userGreetingContainer = document.getElementById('user-greeting-container');
             const userGreetingEmailSpan = document.getElementById('user-greeting-email');
             if (dataFromServer.currentUserEmail) {
                 if (userGreetingEmailSpan) userGreetingEmailSpan.textContent = dataFromServer.currentUserEmail;
                 if (userGreetingContainer) userGreetingContainer.style.display = 'block'; 
+                const emailFooter = document.getElementById('user-email-footer-display');
+                if(emailFooter) emailFooter.textContent = `Conectado como: ${dataFromServer.currentUserEmail}`;
             } else if (userGreetingContainer) userGreetingContainer.style.display = 'none';
-            populateFilters(); applyFiltersAndRender(); renderQuickLinks(); 
-            updateSprintDetails(); setInterval(updateSprintDetails, 1000); 
+            
+            populateFilters(); 
+            populateImpedimentFeatureFilter(); 
+            applyFiltersAndRender(); 
+            renderQuickLinks(); 
+            renderImpediments(); 
+            renderUpcomingEvents();
+            renderTeamCommunications(); 
+            
+            updateSprintDetails(); 
+            setInterval(updateSprintDetails, 1000); 
             displayAnnouncements(); 
+            
+            google.script.run.withSuccessHandler(displayTeamMood).getTeamMood();
+
             hideLoading(); 
         }
+
         document.addEventListener('DOMContentLoaded', () => {
             showLoading("Cargando datos iniciales..."); 
             google.script.run
                 .withSuccessHandler(initializeDashboardWithData) 
-                .withFailureHandler(err => { displayErrorOnOverlay(`Fallo crítico: ${err.message}`); console.error("Fallo getAllSheetData:", err);})
+                .withFailureHandler(err => { 
+                    displayErrorOnOverlay(`Fallo crítico al cargar datos: ${err.message}. <br>Asegúrate de que el script tiene permisos y el Spreadsheet ID es correcto.`); 
+                    console.error("Fallo getAllSheetData:", err);
+                })
                 .getAllSheetData(); 
-            setupFilterListeners(); setupMoodSelector(); setupQuickComments();
+            
+            setupFilterListeners(); 
+            setupMoodSelector(); 
+            setupImpedimentSubmission(); 
         });
     </script>
 </body>
