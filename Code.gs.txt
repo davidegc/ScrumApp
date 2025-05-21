@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI'; 
+const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI'; // Mantén tu ID aquí
 
 const FEATURES_SHEET_NAME = 'Features';
 const USER_STORIES_SHEET_NAME = 'UserStories';
@@ -9,17 +9,21 @@ const MOODS_SHEET_NAME = 'Moods';
 const IMPEDIMENTS_SHEET_NAME = 'Impediments';
 const QUICKLINKS_SHEET_NAME = 'QuickLinks';
 const UPCOMING_EVENTS_SHEET_NAME = 'UpcomingEvents';
-const COMMUNICATIONS_SHEET_NAME = 'Comunicados'; 
+const COMMUNICATIONS_SHEET_NAME = 'Comunicados';
 
 const APP_CONFIG_DEFAULTS = {
   APP_TITLE: 'Scrum App',
   APP_SUBTITLE: 'Panel de Seguimiento Ágil',
   HELP_CHAT_URL: '#',
-  TEAM_MESSAGE_CARD_TITLE: 'Comunicados del Equipo', 
+  TEAM_MESSAGE_CARD_TITLE: 'Comunicados del Equipo',
   IMPEDIMENT_NOTIFICATION_EMAIL: '',
   CALENDAR_ID_SHEET: UPCOMING_EVENTS_SHEET_NAME,
   MAX_CALENDAR_EVENTS: 10,
-  TEAM_MOOD_DEFAULT_EMOJI: "😊"
+  TEAM_MOOD_DEFAULT_EMOJI: "😊",
+  APP_DATA_SOURCE_URL: '#',
+  UPCOMING_EVENTS_EDIT_URL: '#',
+  COMMUNICATIONS_EDIT_URL: '#',
+  QUICKLINKS_EDIT_URL: '#'
 };
 
 /**
@@ -54,7 +58,7 @@ function getAllSheetData() {
     podiumDataFeatures: [], podiumDataUserStories: [], podiumDataDependencies: [],
     availableQs: [], availableSprints: [],
     allFeaturesForImpediments: [], nonDeployedUserStories: [], upcomingEvents: [],
-    communications: [] 
+    communications: []
   };
 
   try {
@@ -117,12 +121,12 @@ function getAllSheetData() {
 
     let communicationsData = getDataFromSheet(COMMUNICATIONS_SHEET_NAME, []);
     communicationsData = communicationsData
-        .filter(comm => comm.Message && String(comm.Message).trim() !== "") // Ya no filtra por 'Show'
-        .sort((a, b) => {
-            const dateA = a.Date ? new Date(a.Date) : new Date(0); 
-            const dateB = b.Date ? new Date(b.Date) : new Date(0);
-            return dateB.getTime() - dateA.getTime(); 
-        });
+      .filter(comm => comm.Message && String(comm.Message).trim() !== "")
+      .sort((a, b) => {
+        const dateA = a.Date ? new Date(a.Date) : new Date(0);
+        const dateB = b.Date ? new Date(b.Date) : new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
     Logger.log(`Comunicados procesados: ${communicationsData.length}`);
 
 
@@ -139,8 +143,43 @@ function getAllSheetData() {
     if (featuresData.length > 0) {
       featuresData = featuresData.map(feature => {
         const featureIdStr = String(feature.ID);
-        const associatedUserStories = userStoriesData.filter(us => String(us.FeatureID) === featureIdStr);
-        const associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr);
+        let associatedUserStories = userStoriesData.filter(us => String(us.FeatureID) === featureIdStr);
+        let associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr);
+
+        associatedUserStories.sort((a, b) => {
+          const sprintA = String(a.Sprint || '').trim();
+          const sprintB = String(b.Sprint || '').trim();
+          const nameA = String(a.Name || '').toLowerCase();
+          const nameB = String(b.Name || '').toLowerCase();
+
+          if (sprintA !== sprintB) {
+            const numA = parseInt(sprintA.replace(/[^0-9]/g, ''), 10);
+            const numB = parseInt(sprintB.replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+              return numB - numA;
+            }
+            return sprintB.localeCompare(sprintA, undefined, {numeric: true, sensitivity: 'base'});
+          }
+          return nameB.localeCompare(nameA);
+        });
+
+        associatedDependencies.sort((a, b) => {
+          const sprintA = String(a.Sprint || '').trim();
+          const sprintB = String(b.Sprint || '').trim();
+          const nameA = String(a.Name || '').toLowerCase();
+          const nameB = String(b.Name || '').toLowerCase();
+
+          if (sprintA !== sprintB) {
+            const numA = parseInt(sprintA.replace(/[^0-9]/g, ''), 10);
+            const numB = parseInt(sprintB.replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+              return numB - numA;
+            }
+            return sprintB.localeCompare(sprintA, undefined, {numeric: true, sensitivity: 'base'});
+          }
+          return nameB.localeCompare(nameA);
+        });
+
         return {
           ...feature,
           userStories: associatedUserStories,
@@ -151,7 +190,7 @@ function getAllSheetData() {
       });
     }
 
-    const calculatePodium = (items) => {
+    const calculatePodium = (items, itemType = 'item') => { // Añadido itemType para loggeo
       const podium = [];
       if (items && items.length > 0) {
         const responsibles = [...new Set(items.map(item => item.Responsible).filter(Boolean))];
@@ -160,17 +199,23 @@ function getAllSheetData() {
           const totalItems = responsibleItems.length;
           if (totalItems > 0) {
             const deployedItems = responsibleItems.filter(item => String(item.Status).trim().toLowerCase() === 'deployed').length;
-            podium.push({ responsible: responsible, progress: Math.round((deployedItems / totalItems) * 100) });
+            podium.push({
+              responsible: responsible,
+              progress: Math.round((deployedItems / totalItems) * 100),
+              deployedItems: deployedItems, // Requerimiento Podios
+              totalItems: totalItems        // Requerimiento Podios
+            });
           }
         });
         podium.sort((a, b) => b.progress - a.progress);
       }
+      // Logger.log(`Podium para ${itemType}: ${JSON.stringify(podium)}`);
       return podium;
     };
 
-    const podiumDataFeatures = calculatePodium(featuresData);
-    const podiumDataUserStories = calculatePodium(userStoriesData);
-    const podiumDataDependencies = calculatePodium(dependenciesData);
+    const podiumDataFeatures = calculatePodium(featuresData, 'Features');
+    const podiumDataUserStories = calculatePodium(userStoriesData, 'UserStories');
+    const podiumDataDependencies = calculatePodium(dependenciesData, 'Dependencies');
 
     const allQsList = [...new Set(featuresData.map(f => f.Q).filter(Boolean))].sort();
     const allSprintsList = [...new Set(
@@ -178,7 +223,15 @@ function getAllSheetData() {
         ...userStoriesData.map(us => us.Sprint),
         ...dependenciesData.map(dep => dep.Sprint)
       ].filter(Boolean)
-    )].sort();
+    )].sort((a, b) => {
+        const numA = parseInt(String(a).replace(/[^0-9]/g, ''), 10);
+        const numB = parseInt(String(b).replace(/[^0-9]/g, ''), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+            return numA - numB;
+        }
+        return String(a).localeCompare(String(b), undefined, {numeric: true, sensitivity: 'base'});
+    });
+
 
     const upcomingEvents = getUpcomingEventsFromSheet(config.CALENDAR_ID_SHEET, config.MAX_CALENDAR_EVENTS);
 
@@ -198,7 +251,7 @@ function getAllSheetData() {
       allFeaturesForImpediments: allFeaturesForImpediments,
       nonDeployedUserStories: nonDeployedUserStories,
       upcomingEvents: upcomingEvents,
-      communications: communicationsData 
+      communications: communicationsData
     };
 
     return dataToReturn;
@@ -440,7 +493,7 @@ function getUpcomingEventsFromSheet(sheetName, maxEvents) {
 function getSheetDataAsObjects(sheet, sheetName) {
   if (!sheet) return [];
   const numRows = sheet.getLastRow();
-  if (numRows < 1) return []; 
+  if (numRows < 1) return [];
   const lastColumn = sheet.getLastColumn();
   if (lastColumn === 0) return [];
 
@@ -454,10 +507,10 @@ function getSheetDataAsObjects(sheet, sheetName) {
     else if (pHeader === "Feature ID") pHeader = "FeatureID";
     else if (pHeader === "Tag Class") pHeader = "TagClass";
     else if (pHeader === "Seguimiento") pHeader = "Responsible";
-    else if (pHeader === "Show" || pHeader === "Mostrar") pHeader = "Show"; 
+    else if (pHeader === "Show" || pHeader === "Mostrar") pHeader = "Show";
     else if (sheetName === ANNOUNCEMENTS_SHEET_NAME && pHeader === "Announcements: Text") pHeader = "Text";
-    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "Text") pHeader = "Text"; 
-    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "URL") pHeader = "URL";   
+    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "Text") pHeader = "Text";
+    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "URL") pHeader = "URL";
     else if (pHeader === "Favorite") pHeader = "Favorite";
     else if (pHeader === "Q" || pHeader === "Quarter") pHeader = "Q";
     else if (pHeader === "Sprint" || pHeader === "Sprint Number") pHeader = "Sprint";
@@ -476,62 +529,71 @@ function getSheetDataAsObjects(sheet, sheetName) {
     else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "Fecha") pHeader = "Date";
     else if (sheetName === COMMUNICATIONS_SHEET_NAME && (pHeader === "Comunicado" || pHeader === "Mensaje")) pHeader = "Message";
     else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "URL") pHeader = "URL";
-    // No se necesita mapeo para "Mostrar" en Comunicados si se elimina la columna/lógica
-
 
     pHeader = pHeader.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s+/g, '');
     return pHeader;
   });
 
   const objects = [];
-  if (numRows < 2) return []; 
+  if (numRows < 2) return [];
 
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     const object = {};
     let hasData = false;
     headers.forEach((header, index) => {
-      if (!header) return; 
+      if (!header) return;
       let cellVal = row[index];
 
       if (cellVal instanceof Date) {
         if (((sheetName === IMPEDIMENTS_SHEET_NAME || sheetName === MOODS_SHEET_NAME) && header === 'Timestamp') ||
-            (sheetName === UPCOMING_EVENTS_SHEET_NAME && (header === 'StartDate' || header === 'EndDate')) ||
-            (sheetName === COMMUNICATIONS_SHEET_NAME && header === 'Date') 
-           ) {
-          object[header] = cellVal; 
-        } else { 
+          ((sheetName === UPCOMING_EVENTS_SHEET_NAME || sheetName === COMMUNICATIONS_SHEET_NAME) && (header === 'StartDate' || header === 'EndDate' || header === 'Date'))
+        ) {
+          object[header] = cellVal;
+        } else {
           object[header] = Utilities.formatDate(cellVal, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'");
         }
       } else {
-        if ((sheetName === UPCOMING_EVENTS_SHEET_NAME && (header === 'StartDate' || header === 'EndDate') && cellVal) ||
-            (sheetName === COMMUNICATIONS_SHEET_NAME && header === 'Date' && cellVal)
-           ) {
+        if (((sheetName === UPCOMING_EVENTS_SHEET_NAME || sheetName === COMMUNICATIONS_SHEET_NAME) && (header === 'StartDate' || header === 'EndDate' || header === 'Date') && cellVal)) {
           try {
             let parsedDate = new Date(cellVal);
-            if (isNaN(parsedDate.getTime())) { 
+            if (isNaN(parsedDate.getTime())) {
               if (String(cellVal).includes('/')) {
-                  const parts = String(cellVal).split('/');
-                  if (parts.length === 3) {
-                      if (parseInt(parts[0], 10) <= 12 && parseInt(parts[1], 10) <=31) { 
-                          parsedDate = new Date(parts[2], parts[0] - 1, parts[1]);
-                      } else if (parseInt(parts[1], 10) <= 12 && parseInt(parts[0], 10) <=31) { 
-                         parsedDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                      }
-                  }
+                const parts = String(cellVal).split('/');
+                if (parts.length === 3) {
+                    let day, month, year;
+                    year = parseInt(parts[2], 10);
+                    if (parseInt(parts[0], 10) > 12 && parseInt(parts[1], 10) <= 12) {
+                        day = parseInt(parts[0], 10);
+                        month = parseInt(parts[1], 10);
+                    } else if (parseInt(parts[1], 10) > 12 && parseInt(parts[0], 10) <= 12) {
+                        day = parseInt(parts[1], 10);
+                        month = parseInt(parts[0], 10);
+                    } else {
+                        month = parseInt(parts[0], 10);
+                        day = parseInt(parts[1], 10);
+                        if (month > 12) {
+                            month = parseInt(parts[1], 10);
+                            day = parseInt(parts[0], 10);
+                        }
+                    }
+                    if (day && month && year) {
+                         parsedDate = new Date(year, month - 1, day);
+                    }
+                }
               }
             }
 
             if (isNaN(parsedDate.getTime())) {
-                Logger.log(`Fecha string inválida en ${sheetName}, header ${header}: ${cellVal}. Se mantiene como string.`);
-                object[header] = cellVal;
+              Logger.log(`Fecha string inválida en ${sheetName}, header ${header}: ${cellVal}. Se mantiene como string.`);
+              object[header] = cellVal;
             } else {
-                object[header] = parsedDate; 
+              object[header] = parsedDate;
             }
 
           } catch (e) {
             Logger.log(`Error parseando fecha string en ${sheetName}, header ${header}: ${cellVal} - ${e}`);
-            object[header] = cellVal; 
+            object[header] = cellVal;
           }
         } else {
           object[header] = cellVal;
@@ -543,12 +605,9 @@ function getSheetDataAsObjects(sheet, sheetName) {
       if (header === 'StatusOrder' || header === 'Order') {
         const numVal = parseFloat(cellVal);
         object[header] = (cellVal !== "" && cellVal !== null && !isNaN(numVal)) ? numVal : null;
-      } else if (header === 'ID' || header === 'FeatureID' || header === 'AssociatedUserStoryID' || header === 'AssociatedFeatureID') {
+      } else if (header === 'ID' || header === 'FeatureID' || header === 'AssociatedUserStoryID' || header === 'AssociatedFeatureID' || header === 'Sprint') {
         object[header] = (cellVal !== "" && cellVal !== null) ? String(cellVal).trim() : null;
       } else if (header === 'Show' || header === 'Favorite' || header === 'AllDayEvent') {
-        // Para la hoja Comunicados, si la columna "Show" no existe, este 'if' no se cumplirá para ella.
-        // Si existe y quieres ignorarla para Comunicados, necesitarías una condición adicional:
-        // if ((header === 'Show' && sheetName !== COMMUNICATIONS_SHEET_NAME) || header === 'Favorite' || header === 'AllDayEvent')
         object[header] = (String(cellVal).trim().toLowerCase() === 'true' || cellVal === true);
       }
     });
@@ -556,8 +615,8 @@ function getSheetDataAsObjects(sheet, sheetName) {
       if (object.Timestamp instanceof Date) object.Timestamp = object.Timestamp.toISOString();
       if (object.StartDate instanceof Date) object.StartDate = object.StartDate.toISOString();
       if (object.EndDate instanceof Date) object.EndDate = object.EndDate.toISOString();
-      if (object.Date instanceof Date) object.Date = object.Date.toISOString(); 
-      
+      if (object.Date instanceof Date) object.Date = object.Date.toISOString();
+
       objects.push(object);
     }
   }

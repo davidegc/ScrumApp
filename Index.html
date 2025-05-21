@@ -24,6 +24,8 @@
         .card-header { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .card-header h2, .card-header h3 { font-size: 1.125rem; font-weight: 600; color: #1f2937; margin-right: auto; }
         .card-header .counter { font-size: 0.875rem; font-weight: 500; color: #4b5563; background-color: #e5e7eb; padding: 4px 8px; border-radius: 9999px; margin-left: 10px; }
+        .edit-link-icon-wrapper { margin-left: 8px; color: #6b7280; }
+        .edit-link-icon-wrapper:hover { color: #3b82f6; }
         
         .search-container { padding: 0px 20px 12px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
@@ -49,7 +51,6 @@
         .general-progress-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out; }
         .general-progress-text { font-size: 0.75rem; font-weight: 500; color: #4b5563; }
         
-        /* Announcements */
         .announcements-container { margin-bottom: 1rem; }
         .announcement-bubble { 
             padding: 16px 20px; 
@@ -59,8 +60,8 @@
             border-left-width: 5px; 
             border-left-style: solid;
             background-color: #fffbeb; 
-            border-color: #f59e0b;   
-            color: #b45309;         
+            border-color: #f59e0b;  
+            color: #b45309;      
         }
         .announcement-content { 
             flex-grow: 1; font-size: 0.95rem; 
@@ -147,8 +148,7 @@
         .quick-link .fa-external-link-alt { color: #9ca3af; font-size: 0.8em; }
         .quick-link:hover .fa-external-link-alt { color: #6b7280; }
 
-        /* Estilos para Comunicados */
-        #communications-list-wrapper { max-height: 280px; overflow-y: auto; padding-right: 5px; } /* Ajustar altura si es necesario */
+        #communications-list-wrapper { max-height: 280px; overflow-y: auto; padding-right: 5px; }
         .communication-item { padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; }
         .communication-item:hover { background-color: #eff6ff; }
         .communication-date { font-size: 0.75rem; color: #6b7280; margin-bottom: 4px; }
@@ -217,7 +217,8 @@
         .podium-item .progress-bar-container { margin-top: 2px; height: 10px; background-color: #e5e7eb; border-radius: 9999px; overflow:hidden; } 
         .podium-item .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out;}
         .podium-responsible-name { font-weight: 500; color: #374151; }
-        .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: 8px; }
+        .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: auto; /* Alinea el porcentaje a la derecha */ }
+        .podium-item-counts { font-size: 0.75rem; color: #4b5563; margin-left: 6px; } /* Estilo para los conteos */
         .scrollable-list-container { max-height: 220px; overflow-y: auto; padding-right: 5px; } 
     </style>
 </head>
@@ -272,7 +273,6 @@
         </section>
     </div>
 
-
     <div class="filters-wrapper">
         <div class="filter-container">
             <label for="global-q-filter"><i class="fas fa-calendar-week"></i> Q:</label>
@@ -286,15 +286,23 @@
                 <option value="all">Todos</option>
             </select>
         </div>
-        <div class="filter-container">
-            <label for="global-status-filter"><i class="fas fa-check-circle"></i>Estatus:</label>
-            <select id="global-status-filter">
+        <div class="filter-container"> <label for="global-activity-filter"><i class="fas fa-tasks"></i> Actividad:</label>
+            <select id="global-activity-filter">
                 <option value="all">Todos</option>
+                <option value="feature">Feature</option>
+                <option value="userstory">Historia</option>
+                <option value="dependency">Dependencia</option>
             </select>
         </div>
         <div class="filter-container">
             <label for="global-responsible-filter"><i class="fas fa-user-check"></i>Seguimiento:</label>
             <select id="global-responsible-filter">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+        <div class="filter-container">
+            <label for="global-status-filter"><i class="fas fa-check-circle"></i>Estatus:</label>
+            <select id="global-status-filter">
                 <option value="all">Todos</option>
             </select>
         </div>
@@ -316,7 +324,7 @@
                 </div>
                 <div class="general-progress-container">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="general-progress-text">Progreso General Features</span>
+                        <span id="features-progress-text-label" class="general-progress-text">Progreso General Features</span>
                         <span id="features-progress-percentage" class="general-progress-text">0%</span>
                     </div>
                     <div class="general-progress-bar-bg">
@@ -331,7 +339,7 @@
                                 <th class="col-uniform">Seguimiento</th>
                                 <th class="col-uniform">ID</th>
                                 <th class="col-uniform">Etiquetas</th>
-                                <th class="col-expand"><span class="sr-only">Expandir</span></th>                        
+                                <th class="col-expand"><span class="sr-only">Expandir</span></th>                                
                             </tr>
                         </thead>
                         <tbody id="features-list-tbody">
@@ -397,7 +405,7 @@
                 </div>
             </section>
             
-            <section class="card">
+            <section class="card" id="quick-links-card">
                 <div class="card-header">
                     <h2><i class="fas fa-link mr-2 text-green-500"></i>Enlaces Útiles</h2>
                 </div>
@@ -522,9 +530,10 @@
             const selectedStatus = document.getElementById('global-status-filter').value;
             const selectedQ = document.getElementById('global-q-filter').value;
             const selectedSprint = document.getElementById('global-sprint-filter').value;
+            const selectedActivity = document.getElementById('global-activity-filter').value; // Nuevo filtro
             const featureSearchTerm = document.getElementById('features-search-input').value;
             
-            renderFeatures(selectedResponsible, selectedStatus, selectedQ, selectedSprint, featureSearchTerm);
+            renderFeatures(selectedResponsible, selectedStatus, selectedQ, selectedSprint, selectedActivity, featureSearchTerm);
             renderPodium(masterPodiumDataFeatures, 'podium-features-container', 'no-podium-features-data-message', selectedResponsible);
             renderPodium(masterPodiumDataUserStories, 'podium-us-container', 'no-podium-us-data-message', selectedResponsible);
             renderPodium(masterPodiumDataDependencies, 'podium-dependencies-container', 'no-podium-dependencies-data-message', selectedResponsible);
@@ -533,14 +542,30 @@
         function updateGeneralProgress(sectionPrefix, filteredData) {
             const percentageElement = document.getElementById(`${sectionPrefix}-progress-percentage`);
             const barElement = document.getElementById(`${sectionPrefix}-progress-bar`);
+            const progressTextLabel = document.getElementById(`${sectionPrefix}-progress-text-label`); 
+
             if (!percentageElement || !barElement) return;
-            const totalItems = filteredData.length;
+
+            const totalItems = filteredData.length; 
             const deployedItems = filteredData.filter(item => String(item.Status).trim().toLowerCase() === 'deployed').length;
             const percentage = totalItems > 0 ? Math.round((deployedItems / totalItems) * 100) : 0;
+            
             percentageElement.textContent = `${percentage}%`;
             barElement.style.width = `${percentage}%`;
             barElement.className = `general-progress-bar-fill ${getProgressBarColorGeneral(percentage)}`;
+
+            if (sectionPrefix === 'features' && progressTextLabel) {
+                const totalFeatures = filteredData.length;
+                let totalUserStories = 0;
+                let totalDependencies = 0;
+                filteredData.forEach(feature => {
+                    totalUserStories += (feature.userStoryCount || 0);
+                    totalDependencies += (feature.dependencyCount || 0);
+                });
+                progressTextLabel.textContent = `Progreso (F: ${totalFeatures}, HU: ${totalUserStories}, D: ${totalDependencies})`;
+            }
         }
+
 
         function toggleFeatureDetails(featureRowId, iconElement) {
             const detailsRow = document.getElementById(`details-${featureRowId}`);
@@ -548,8 +573,7 @@
                 const isHidden = detailsRow.style.display === 'none' || detailsRow.style.display === '';
                 detailsRow.style.display = isHidden ? 'table-row' : 'none'; 
                 if (iconElement) {
-                    iconElement.classList.toggle('fa-chevron-right', !isHidden);
-                    iconElement.classList.toggle('fa-chevron-down', isHidden);
+                    iconElement.classList.toggle('expanded', isHidden);
                 }
             }
         }
@@ -560,14 +584,18 @@
             const nameA = String(a.Name || '').toLowerCase();
             const nameB = String(b.Name || '').toLowerCase();
 
-            if (statusA === 'new' && statusB !== 'new') return -1;
-            if (statusA !== 'new' && statusB === 'new') return 1;
-            if (statusA === 'deployed' && statusB !== 'deployed') return 1;
-            if (statusA !== 'deployed' && statusB === 'deployed') return -1;
+            const statusOrder = { 'new': 1, 'in progress': 2, 'qa': 3, 'blocked': 4, 'deployed': 5, 'discarded': 6 };
+            const orderA = statusOrder[statusA] || 7;
+            const orderB = statusOrder[statusB] || 7;
+
+            if (orderA !== orderB) {
+                return orderA - orderB;
+            }
             return nameA.localeCompare(nameB);
         }
-
-        function renderFeatures(filterResponsible, filterStatus, filterQ, filterSprint, searchTerm = '') {
+        
+        // Modificada para incluir filterActivity
+        function renderFeatures(filterResponsible, filterStatus, filterQ, filterSprint, filterActivity, searchTerm = '') {
             const tbody = document.getElementById('features-list-tbody');
             const counterElement = document.getElementById('features-counter');
             const noFeaturesMessage = document.getElementById('no-features-message');
@@ -576,56 +604,86 @@
             const lowerSearchTerm = searchTerm.toLowerCase();
 
             let filteredData = masterFeaturesData.filter(feature => {
-                let responsibleMatch = (filterResponsible === 'all' || feature.Responsible === filterResponsible);
-                if (filterResponsible !== 'all' && feature.Responsible !== filterResponsible) { 
-                        responsibleMatch = (feature.userStories && feature.userStories.some(us => us.Responsible === filterResponsible)) ||
-                                        (feature.dependencies && feature.dependencies.some(dep => dep.Responsible === filterResponsible));
-                }
-                if (!responsibleMatch) return false;
-
-                if (filterStatus !== 'all') {
-                    let statusMatchFeature = (String(feature.Status || '').trim() === filterStatus);
-                    let statusMatchUserStory = false;
-                    if (feature.userStories && feature.userStories.length > 0) {
-                        statusMatchUserStory = feature.userStories.some(us => String(us.Status || '').trim() === filterStatus);
-                    }
-                    let statusMatchDependency = false;
-                    if (feature.dependencies && feature.dependencies.length > 0) {
-                        statusMatchDependency = feature.dependencies.some(dep => String(dep.Status || '').trim() === filterStatus);
-                    }
-                    if (!statusMatchFeature && !statusMatchUserStory && !statusMatchDependency) return false;
-                }
+                // Función auxiliar para verificar si un item (feature, US, Dep) cumple con los filtros básicos (no actividad)
+                const itemMatchesBaseFilters = (item, itemResponsible, itemStatus, itemQ, itemSprint) => {
+                    if (filterResponsible !== 'all' && itemResponsible !== filterResponsible) return false;
+                    if (filterStatus !== 'all' && String(itemStatus || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
+                    if (filterQ !== 'all' && String(itemQ || '') !== filterQ) return false; // Para Q en Feature
+                    if (itemSprint && filterSprint !== 'all' && String(itemSprint || '') !== filterSprint) return false; // Para Sprint en US/Dep
+                    return true;
+                };
                 
-                if (filterQ !== 'all' && String(feature.Q) !== filterQ) return false;
-                
-                if (filterSprint !== 'all') {
-                    const hasMatchingSprintItem = 
-                        (feature.userStories && feature.userStories.some(us => String(us.Sprint) === filterSprint)) ||
-                        (feature.dependencies && feature.dependencies.some(dep => String(dep.Sprint) === filterSprint));
-                    if (!hasMatchingSprintItem) return false;
-                }
-
-                if (searchTerm) {
+                // Función auxiliar para la búsqueda por término
+                const searchInItem = (item) => {
+                    if (!searchTerm) return true; // Si no hay término de búsqueda, el item pasa este filtro
                     const searchInText = (text) => text && String(text).toLowerCase().includes(lowerSearchTerm);
-                    let foundInFeature = searchInText(feature.Name) || searchInText(feature.Responsible) || searchInText(feature.ID) || 
-                                        searchInText(feature.Q) || searchInText(feature.Priority) || searchInText(feature.Status);
-                    if (foundInFeature) return true;
+                    return searchInText(item.Name) || searchInText(item.Responsible) || searchInText(item.ID) ||
+                           searchInText(item.Q) || searchInText(item.Priority) || searchInText(item.Status) ||
+                           searchInText(item.Sprint); // Añadir Sprint a la búsqueda general
+                };
 
-                    const foundInUserStories = feature.userStories?.some(us => 
-                        searchInText(us.Name) || searchInText(us.Responsible) || searchInText(us.ID) || 
-                        searchInText(us.Sprint) || searchInText(us.Priority) || searchInText(us.Status)
-                    );
-                    if (foundInUserStories) return true;
-
-                    const foundInDependencies = feature.dependencies?.some(dep => 
-                        searchInText(dep.Name) || searchInText(dep.Responsible) || searchInText(dep.ID) || 
-                        searchInText(dep.Sprint) || searchInText(dep.Priority) || searchInText(dep.Status)
-                    );
-                    if (foundInDependencies) return true;
-                    
-                    return false; 
+                // Aplicar filtros básicos a la Feature
+                if (!itemMatchesBaseFilters(feature, feature.Responsible, feature.Status, feature.Q, null)) {
+                     // Si la feature misma no cumple Q o su propio Estatus/Responsable (cuando filtro de actividad es 'feature' o 'all')
+                    if (filterActivity === 'all' || filterActivity === 'feature') {
+                         if (filterQ !== 'all' && String(feature.Q) !== filterQ) return false;
+                         if (filterResponsible !== 'all' && feature.Responsible !== filterResponsible) return false;
+                         if (filterStatus !== 'all' && String(feature.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
+                    } else { // Si filtramos por HU o Dep, la feature puede pasar si un hijo cumple
+                        // No retornar false aquí todavía, se evaluará en los hijos
+                    }
                 }
-                return true; 
+
+
+                // Filtro de Actividad
+                let activityMatch = false;
+                if (filterActivity === 'all') {
+                    activityMatch = true; // Si es 'all', la feature pasa si cumple filtros base y búsqueda
+                } else if (filterActivity === 'feature') {
+                    activityMatch = itemMatchesBaseFilters(feature, feature.Responsible, feature.Status, feature.Q, null) && searchInItem(feature);
+                } else if (filterActivity === 'userstory') {
+                    if (feature.userStories && feature.userStories.some(us => itemMatchesBaseFilters(us, us.Responsible, us.Status, feature.Q, us.Sprint) && searchInItem(us))) {
+                        activityMatch = true;
+                    }
+                } else if (filterActivity === 'dependency') {
+                    if (feature.dependencies && feature.dependencies.some(dep => itemMatchesBaseFilters(dep, dep.Responsible, dep.Status, feature.Q, dep.Sprint) && searchInItem(dep))) {
+                        activityMatch = true;
+                    }
+                }
+                
+                if (!activityMatch) return false;
+
+                // Búsqueda global (si no se hizo ya dentro del filtro de actividad específico)
+                // Si el filtro de actividad es 'all', necesitamos asegurar que la feature o alguno de sus hijos coincida con la búsqueda
+                if (filterActivity === 'all' && searchTerm) {
+                    if (searchInItem(feature)) return true;
+                    if (feature.userStories?.some(us => searchInItem(us))) return true;
+                    if (feature.dependencies?.some(dep => searchInItem(dep))) return true;
+                    return false; // Si es 'all' y hay término de búsqueda, y nada coincide, se descarta.
+                }
+                
+                // Considerar el caso donde el filtro de responsable/estatus/sprint debe aplicar al hijo si la actividad es HU/Dep
+                if (filterActivity === 'userstory') {
+                    return feature.userStories?.some(us => 
+                        (filterResponsible === 'all' || us.Responsible === filterResponsible) &&
+                        (filterStatus === 'all' || String(us.Status || '').trim().toLowerCase() === filterStatus.toLowerCase()) &&
+                        (filterSprint === 'all' || String(us.Sprint || '') === filterSprint) &&
+                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && // Q de la feature padre
+                        searchInItem(us)
+                    );
+                }
+                if (filterActivity === 'dependency') {
+                     return feature.dependencies?.some(dep => 
+                        (filterResponsible === 'all' || dep.Responsible === filterResponsible) &&
+                        (filterStatus === 'all' || String(dep.Status || '').trim().toLowerCase() === filterStatus.toLowerCase()) &&
+                        (filterSprint === 'all' || String(dep.Sprint || '') === filterSprint) &&
+                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && // Q de la feature padre
+                        searchInItem(dep)
+                    );
+                }
+
+
+                return true; // Si pasó todos los filtros
             });
             
             filteredData.sort(customSortItems);
@@ -634,14 +692,14 @@
 
             if (filteredData.length === 0) {
                 noFeaturesMessage.style.display = 'table-row'; 
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 italic">${searchTerm ? 'Ninguna feature coincide con la búsqueda.' : 'No hay features que coincidan con los filtros.'}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 italic">${searchTerm || filterActivity !=='all' ? 'Ningún ítem coincide con los filtros/búsqueda.' : 'No hay features para mostrar.'}</td></tr>`;
                 counterElement.textContent = `Desplegadas: 0 de 0`;
                 return;
             }
             noFeaturesMessage.style.display = 'none';
 
             filteredData.forEach((feature, index) => {
-                const featureRowId = `feature-row-${feature.ID || index}`;
+                const featureRowId = `feature-row-${(feature.ID || index).toString().replace(/[^a-zA-Z0-9-_]/g, '')}`;
                 
                 const featureNameDisplay = feature.Name || 'Feature sin nombre';
                 const featureIdDisplay = feature.URL ? 
@@ -674,10 +732,28 @@
                 detailsCell.colSpan = 5; 
                 detailsCell.className = 'feature-details-row';
                 
-                let userStoriesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Historias de Usuario asociadas.</td></tr>`;
-                if (feature.userStories && feature.userStories.length > 0) {
-                    const sortedUserStories = [...feature.userStories].sort(customSortItems);
-                    userStoriesHtml = sortedUserStories.map(us => {
+                // Filtrar HUs y Dependencias también según los filtros globales si el filtro de actividad no es específico para ellos
+                const filterItem = (item, itemType) => {
+                    if (filterActivity !== 'all' && filterActivity !== itemType && filterActivity !== 'feature') return false; // Si filtramos por feature, mostramos todos sus hijos que cumplan
+                    if (filterResponsible !== 'all' && item.Responsible !== filterResponsible) return false;
+                    if (filterStatus !== 'all' && String(item.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
+                    if (filterSprint !== 'all' && String(item.Sprint || '') !== filterSprint) return false;
+                    if (filterQ !== 'all' && String(feature.Q || '') !== filterQ) return false; // Q de la feature padre
+                    if (searchTerm && ! (String(item.Name || '').toLowerCase().includes(lowerSearchTerm) || String(item.ID || '').toLowerCase().includes(lowerSearchTerm) )) return false;
+                    return true;
+                };
+
+                let userStoriesToDisplay = feature.userStories || [];
+                if (filterActivity === 'all' || filterActivity === 'feature' || filterActivity === 'userstory') {
+                     userStoriesToDisplay = (feature.userStories || []).filter(us => filterItem(us, 'userstory'));
+                } else { // Si el filtro de actividad es 'dependency', no mostramos HUs a menos que cumplan otros filtros
+                    userStoriesToDisplay = [];
+                }
+
+
+                let userStoriesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Historias de Usuario que coincidan.</td></tr>`;
+                if (userStoriesToDisplay.length > 0) {
+                    userStoriesHtml = userStoriesToDisplay.map(us => {
                         const usNameDisplay = us.Name || 'HU sin nombre';
                         const usIdDisplay = us.JiraLink ? 
                             `<a href="${us.JiraLink}" target="_blank" class="text-blue-600 hover:underline">${us.ID || 'N/A'}</a>` :
@@ -699,10 +775,17 @@
                     }).join('');
                 }
 
-                let dependenciesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Dependencias asociadas.</td></tr>`;
-                if (feature.dependencies && feature.dependencies.length > 0) {
-                    const sortedDependencies = [...feature.dependencies].sort(customSortItems);
-                    dependenciesHtml = sortedDependencies.map(dep => {
+                let dependenciesToDisplay = feature.dependencies || [];
+                 if (filterActivity === 'all' || filterActivity === 'feature' || filterActivity === 'dependency') {
+                    dependenciesToDisplay = (feature.dependencies || []).filter(dep => filterItem(dep, 'dependency'));
+                } else { // Si el filtro de actividad es 'userstory', no mostramos Deps a menos que cumplan otros filtros
+                    dependenciesToDisplay = [];
+                }
+
+
+                let dependenciesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Dependencias que coincidan.</td></tr>`;
+                if (dependenciesToDisplay.length > 0) {
+                    dependenciesHtml = dependenciesToDisplay.map(dep => {
                         const depNameDisplay = dep.Name || 'Dependencia s.n.';
                         const depIdDisplay = dep.URL ? 
                             `<a href="${dep.URL}" target="_blank" class="text-blue-600 hover:underline">${dep.ID || 'N/A'}</a>` :
@@ -726,12 +809,12 @@
 
                 detailsCell.innerHTML = `
                     <div class="feature-details-content">
-                        <h4><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario (${feature.userStories?.length || 0})</h4>
+                        <h4><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario (${userStoriesToDisplay.length || 0})</h4>
                         <table class="nested-table">
                             <thead><tr><th class="col-uniform">Nombre</th><th class="col-uniform">Seguimiento</th><th class="col-uniform">ID</th><th class="col-uniform">Etiquetas</th></tr></thead>
                             <tbody>${userStoriesHtml}</tbody>
                         </table>
-                        <h4><i class="fas fa-project-diagram mr-2 text-teal-500"></i>Dependencias (${feature.dependencies?.length || 0})</h4>
+                        <h4><i class="fas fa-project-diagram mr-2 text-teal-500"></i>Dependencias (${dependenciesToDisplay.length || 0})</h4>
                         <table class="nested-table">
                             <thead><tr><th class="col-uniform">Nombre</th><th class="col-uniform">Seguimiento</th><th class="col-uniform">ID</th><th class="col-uniform">Etiquetas</th></tr></thead>
                             <tbody>${dependenciesHtml}</tbody>
@@ -751,19 +834,28 @@
             const container = document.getElementById('quick-links-container');
             const noLinksMessage = document.getElementById('no-quick-links-message');
             const searchInput = document.getElementById('quick-links-search');
+            const cardHeader = document.querySelector('#quick-links-card .card-header'); 
 
-            if (!searchInput) {
-                console.error("CRITICAL ERROR: Element with ID 'quick-links-search' NOT FOUND in renderQuickLinks!");
+            if (!searchInput || !container || !noLinksMessage || !cardHeader) {
+                console.error("Elementos del DOM para Enlaces Útiles no encontrados.");
                 return; 
             }
-            if (!container) {
-                console.error("CRITICAL ERROR: Element with ID 'quick-links-container' NOT FOUND in renderQuickLinks!");
-                return;
+            
+            if (appConfig.QUICKLINKS_EDIT_URL && appConfig.QUICKLINKS_EDIT_URL !== '#') {
+                let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
+                if (!editIconLink) {
+                    editIconLink = document.createElement('a');
+                    editIconLink.href = appConfig.QUICKLINKS_EDIT_URL;
+                    editIconLink.target = '_blank';
+                    editIconLink.title = 'Editar Enlaces Útiles';
+                    editIconLink.className = 'edit-link-icon-wrapper'; 
+                    editIconLink.innerHTML = '<i class="fas fa-edit"></i>';
+                    cardHeader.appendChild(editIconLink); 
+                } else {
+                    editIconLink.href = appConfig.QUICKLINKS_EDIT_URL; 
+                }
             }
-            if (!noLinksMessage) {
-                console.error("CRITICAL ERROR: Element with ID 'no-quick-links-message' NOT FOUND in renderQuickLinks!");
-                return;
-            }
+
 
             const searchTerm = searchInput.value.toLowerCase().trim();
             let filteredLinks = masterQuickLinksData;
@@ -833,41 +925,59 @@
             noDataMsgElement.style.display = 'none';
 
             displayData.forEach(item => {
-                const podiumItem = document.createElement('div'); 
-                podiumItem.className = 'podium-item mb-3';
-                const nameAndPercentage = document.createElement('div'); 
-                nameAndPercentage.className = 'flex justify-between items-center mb-1';
-                const responsibleName = document.createElement('span'); 
-                responsibleName.className = 'podium-responsible-name text-sm'; 
-                responsibleName.textContent = item.responsible;
-                const progressPercentageElement = document.createElement('span'); 
-                progressPercentageElement.className = 'podium-progress-percentage text-sm'; 
-                progressPercentageElement.textContent = `${item.progress}%`;
-                nameAndPercentage.appendChild(responsibleName); 
-                nameAndPercentage.appendChild(progressPercentageElement);
+                const podiumItemDiv = document.createElement('div'); 
+                podiumItemDiv.className = 'podium-item mb-3';
                 
-                const progressContainer = document.createElement('div'); 
-                progressContainer.className = 'podium-item progress-bar-container';
-                const progressBar = document.createElement('div'); 
-                progressBar.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; 
-                progressBar.style.width = `${item.progress}%`;
-                progressContainer.appendChild(progressBar);
+                const nameAndDetailsDiv = document.createElement('div'); 
+                nameAndDetailsDiv.className = 'flex justify-between items-center mb-1';
                 
-                podiumItem.appendChild(nameAndPercentage); 
-                podiumItem.appendChild(progressContainer);
-                podiumContainer.appendChild(podiumItem);
+                const responsibleNameSpan = document.createElement('span'); 
+                responsibleNameSpan.className = 'podium-responsible-name text-sm'; 
+                responsibleNameSpan.textContent = item.responsible;
+
+                // Contenedor para conteos y porcentaje para alineación
+                const statsContainer = document.createElement('div');
+                statsContainer.className = 'flex items-center';
+
+                const countsSpan = document.createElement('span');
+                countsSpan.className = 'podium-item-counts';
+                countsSpan.textContent = `(${item.deployedItems}/${item.totalItems})`;
+                
+                const progressPercentageSpan = document.createElement('span'); 
+                progressPercentageSpan.className = 'podium-progress-percentage text-sm'; 
+                progressPercentageSpan.textContent = `${item.progress}%`;
+
+                statsContainer.appendChild(countsSpan);
+                statsContainer.appendChild(progressPercentageSpan);
+
+                nameAndDetailsDiv.appendChild(responsibleNameSpan); 
+                nameAndDetailsDiv.appendChild(statsContainer);
+                
+                const progressContainerDiv = document.createElement('div'); 
+                progressContainerDiv.className = 'podium-item progress-bar-container';
+                const progressBarDiv = document.createElement('div'); 
+                progressBarDiv.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; 
+                progressBarDiv.style.width = `${item.progress}%`;
+                progressContainerDiv.appendChild(progressBarDiv);
+                
+                podiumItemDiv.appendChild(nameAndDetailsDiv); 
+                podiumItemDiv.appendChild(progressContainerDiv);
+                podiumContainer.appendChild(podiumItemDiv);
             });
         }
+
 
         function populateFilters() { 
             const responsibleFilter = document.getElementById('global-responsible-filter');
             const statusFilter = document.getElementById('global-status-filter');
             const qFilter = document.getElementById('global-q-filter');
             const sprintFilter = document.getElementById('global-sprint-filter');
+            // El filtro de Actividad tiene opciones estáticas, no se llena aquí
 
             if (!responsibleFilter || !statusFilter || !qFilter || !sprintFilter) return;
             
             const clearOptions = (selectElement) => {
+                // No limpiar la primera opción "Todos" o la opción por defecto
                 while (selectElement.options.length > 1) selectElement.remove(1);
             };
             clearOptions(responsibleFilter);
@@ -900,19 +1010,23 @@
         }
 
         function setupFilterListeners() {
-            document.getElementById('global-responsible-filter').addEventListener('change', applyFiltersAndRender);
-            document.getElementById('global-status-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('global-q-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('global-sprint-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('global-activity-filter').addEventListener('change', applyFiltersAndRender); // Nuevo listener
+            document.getElementById('global-responsible-filter').addEventListener('change', applyFiltersAndRender);
+            document.getElementById('global-status-filter').addEventListener('change', applyFiltersAndRender);
+            
             document.getElementById('clear-filters-btn').addEventListener('click', () => {
-                document.getElementById('global-responsible-filter').value = 'all'; 
-                document.getElementById('global-status-filter').value = 'all'; 
                 document.getElementById('global-q-filter').value = 'all'; 
                 document.getElementById('global-sprint-filter').value = 'all'; 
+                document.getElementById('global-activity-filter').value = 'all'; // Resetear nuevo filtro
+                document.getElementById('global-responsible-filter').value = 'all'; 
+                document.getElementById('global-status-filter').value = 'all'; 
                 document.getElementById('features-search-input').value = ''; 
                 document.getElementById('communications-search-input').value = ''; 
                 applyFiltersAndRender(); 
                 renderTeamCommunications(); 
+                renderQuickLinks();
             });
 
             const quickLinksSearchInput = document.getElementById('quick-links-search');
@@ -1170,10 +1284,6 @@
                         featureSelect.focus();
                         return;
                     }
-                    if (!selectedUserStoryId && (nonDeployedUserStoriesForImpediments || []).filter(us => String(us.FeatureID) === selectedFeatureId).length > 0) {
-                        console.warn("Por favor, selecciona una Historia de Usuario relacionada si hay disponibles.");
-                        usSelect.focus();
-                    }
                     if (!description) {
                         console.warn("Por favor, ingresa una descripción para el impedimento.");
                         descriptionArea.focus();
@@ -1193,8 +1303,8 @@
                         .withSuccessHandler(res => { 
                             if (res.success) {
                                 descriptionArea.value = '';
-                                populateImpedimentUserStoryFilter(); 
                                 usSelect.value = ""; 
+                                populateImpedimentUserStoryFilter(); 
                                 if (res.impediment) { 
                                     masterImpedimentsData.unshift(res.impediment); 
                                     renderImpediments(); 
@@ -1218,7 +1328,24 @@
         function renderUpcomingEvents() {
             const container = document.getElementById('upcoming-events-container');
             const noEventsMessage = document.getElementById('no-upcoming-events-message');
-            if (!container || !noEventsMessage) return;
+            const cardHeader = document.querySelector('#upcoming-events-card .card-header');
+
+            if (!container || !noEventsMessage || !cardHeader) return;
+
+            if (appConfig.UPCOMING_EVENTS_EDIT_URL && appConfig.UPCOMING_EVENTS_EDIT_URL !== '#') {
+                let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
+                if (!editIconLink) {
+                    editIconLink = document.createElement('a');
+                    editIconLink.href = appConfig.UPCOMING_EVENTS_EDIT_URL;
+                    editIconLink.target = '_blank';
+                    editIconLink.title = 'Editar Próximos Eventos';
+                    editIconLink.className = 'edit-link-icon-wrapper'; 
+                    editIconLink.innerHTML = '<i class="fas fa-edit"></i>';
+                    cardHeader.appendChild(editIconLink); 
+                } else {
+                    editIconLink.href = appConfig.UPCOMING_EVENTS_EDIT_URL; 
+                }
+            }
 
             container.innerHTML = ''; 
 
@@ -1247,9 +1374,9 @@
                         const dStart = new Date(event.start);
                         const dEnd = new Date(event.end);
                         
-                        if (dStart.toDateString() !== dEnd.toDateString()) {
-                            const adjustedEndDate = event.fullday ? new Date(dEnd.getTime() - (12*60*60*1000)) : dEnd; 
-                            if (adjustedEndDate >= dStart) { 
+                        if (dStart.toDateString() !== dEnd.toDateString() || (event.fullday && dEnd > dStart) ) {
+                            const adjustedEndDate = event.fullday ? new Date(dEnd.getTime() - (1000)) : dEnd; 
+                            if (adjustedEndDate >= dStart && dStart.toDateString() !== adjustedEndDate.toDateString()) { 
                                 endDateStr = ` - ${adjustedEndDate.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}`;
                             }
                         }
@@ -1268,10 +1395,12 @@
             const listContainer = document.getElementById('communications-list-container');
             const noCommsMessage = document.getElementById('no-communications-message');
             const cardTitleElement = document.getElementById('team-message-card-title');
-            const searchInput = document.getElementById('communications-search-input'); // Necesario para obtener el término de búsqueda
+            const searchInput = document.getElementById('communications-search-input'); 
+            const cardHeader = document.querySelector('#team-message-card .card-header');
 
-            if (!listContainer || !noCommsMessage || !searchInput) {
-                console.error("Elementos del DOM para comunicados no encontrados (listContainer, noCommsMessage, o searchInput).");
+
+            if (!listContainer || !noCommsMessage || !searchInput || !cardHeader) {
+                console.error("Elementos del DOM para comunicados no encontrados.");
                 return;
             }
 
@@ -1280,8 +1409,24 @@
             } else if (cardTitleElement) { 
                 cardTitleElement.innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> Comunicados del Equipo`;
             }
+
+            if (appConfig.COMMUNICATIONS_EDIT_URL && appConfig.COMMUNICATIONS_EDIT_URL !== '#') {
+                let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
+                if (!editIconLink) {
+                    editIconLink = document.createElement('a');
+                    editIconLink.href = appConfig.COMMUNICATIONS_EDIT_URL;
+                    editIconLink.target = '_blank';
+                    editIconLink.title = 'Editar Comunicados';
+                    editIconLink.className = 'edit-link-icon-wrapper';
+                    editIconLink.innerHTML = '<i class="fas fa-edit"></i>';
+                    cardHeader.appendChild(editIconLink);
+                } else {
+                    editIconLink.href = appConfig.COMMUNICATIONS_EDIT_URL;
+                }
+            }
+
             
-            const currentSearchTerm = searchInput.value.toLowerCase().trim(); // Usar el valor actual del input
+            const currentSearchTerm = searchInput.value.toLowerCase().trim(); 
             let filteredComms = masterCommunicationsData;
 
             if (currentSearchTerm) {
@@ -1338,7 +1483,7 @@
         function initializeDashboardWithData(dataFromServer) {
             if (!dataFromServer || dataFromServer.error) {
                 const errorMsg = dataFromServer ? dataFromServer.error : "No se recibieron datos del servidor.";
-                displayErrorOnOverlay(`<div>Error: ${errorMsg}</div><p>Por favor, verifica la configuración de tu Spreadsheet ID y los nombres de las hojas (Features, UserStories, Dependencies, Config, Announcements, Moods, QuickLinks, Impediments, UpcomingEvents, Comunicados).</p>`); 
+                displayErrorOnOverlay(`<div>Error: ${errorMsg}</div><p>Por favor, verifica la configuración de tu Spreadsheet ID y los nombres de las hojas.</p>`); 
                 console.error("Error init:", errorMsg); return; 
             }
             
@@ -1374,12 +1519,23 @@
 
             const userGreetingContainer = document.getElementById('user-greeting-container');
             const userGreetingEmailSpan = document.getElementById('user-greeting-email');
-            if (dataFromServer.currentUserEmail) {
-                if (userGreetingEmailSpan) userGreetingEmailSpan.textContent = dataFromServer.currentUserEmail;
-                if (userGreetingContainer) userGreetingContainer.style.display = 'block'; 
-                const emailFooter = document.getElementById('user-email-footer-display');
-                if(emailFooter) emailFooter.textContent = `Conectado como: ${dataFromServer.currentUserEmail}`;
-            } else if (userGreetingContainer) userGreetingContainer.style.display = 'none';
+            const emailFooter = document.getElementById('user-email-footer-display');
+
+            if (dataFromServer.currentUserEmail && userGreetingEmailSpan && userGreetingContainer) {
+                userGreetingEmailSpan.textContent = dataFromServer.currentUserEmail;
+                userGreetingContainer.style.display = 'block'; 
+            } else if (userGreetingContainer) {
+                 userGreetingContainer.style.display = 'none';
+            }
+            
+            if (appConfig.APP_DATA_SOURCE_URL && appConfig.APP_DATA_SOURCE_URL !== '#' && emailFooter) {
+                // Requerimiento Footer: Mostrar "Documento Fuente" como enlace
+                emailFooter.innerHTML = `<a href="${appConfig.APP_DATA_SOURCE_URL}" target="_blank" class="text-gray-400 hover:text-gray-200 underline">Documento Fuente</a>`;
+            } else if (dataFromServer.currentUserEmail && emailFooter) {
+                emailFooter.textContent = `Conectado como: ${dataFromServer.currentUserEmail}`;
+            } else if (emailFooter) {
+                emailFooter.textContent = '';
+            }
             
             populateFilters(); 
             populateImpedimentFeatureFilter(); 

@@ -5,18 +5,19 @@ Esta aplicación web, construida con Google Apps Script, sirve como un dashboard
 ## Características
 
 * Visualización de Features, Historias de Usuario y Dependencias.
-* Filtros globales por Seguimiento (Responsable), Estatus, Q y Sprint.
-* Barras de progreso generales para cada sección (Features) basadas en el estado "Deployed".
-* Podios de progreso para Features, Historias de Usuario y Dependencias por responsable.
+* **Filtros globales por Q, Sprint, Actividad (Feature, Historia, Dependencia), Seguimiento (Responsable) y Estatus.**
+* Barras de progreso generales para la sección de Features, **mostrando conteo de Features, Historias de Usuario y Dependencias consideradas en el progreso**, basadas en el estado "Deployed".
+* Podios de progreso para Features, Historias de Usuario y Dependencias por responsable, **mostrando conteo de ítems desplegados sobre el total**.
 * Sección de "Anuncios" configurable desde la hoja `Announcements`, con animación y opción de cierre.
-* Sección de "Comunicados del Equipo" dinámica, alimentada desde la hoja `Comunicados`, mostrando fecha, mensaje y enlace opcional con icono. Incluye buscador para filtrar comunicados.
+* Sección de "Comunicados del Equipo" dinámica, alimentada desde la hoja `Comunicados`, mostrando fecha, mensaje y enlace opcional con icono. Incluye buscador para filtrar comunicados. **Con opción de enlace de edición externo.**
 * Registro de "Mood del Usuario" y visualización del "Mood del Equipo (Hoy)" (mood más frecuente del día).
-* Sección de "Enlaces Útiles" con buscador y opción de marcar favoritos.
+* Sección de "Enlaces Útiles" con buscador y opción de marcar favoritos. **Con opción de enlace de edición externo.**
 * Registro de "Impedimentos" con notificación opcional por email y asociación a Features/Historias de Usuario.
-* Sección de "Próximos Eventos" cargados desde una hoja de cálculo.
+* Sección de "Próximos Eventos" cargados desde una hoja de cálculo. **Con opción de enlace de edición externo.**
 * Contador de Sprint con fecha de finalización configurable.
 * Botón de "Ayuda" configurable para enlazar a un chat.
 * Título y subtítulo de la aplicación configurables.
+* **El pie de página muestra "Documento Fuente" como un enlace a la hoja de cálculo si está configurado.**
 
 ## Prerrequisitos
 
@@ -36,10 +37,10 @@ Esta aplicación web, construida con Google Apps Script, sirve como un dashboard
     * `Announcements`
     * `Config`
     * `Moods`
-    * `Impediments` (Anteriormente `Comments`)
+    * `Impediments`
     * `QuickLinks`
     * `UpcomingEvents`
-    * `Comunicados` (Nueva hoja para los mensajes del equipo)
+    * `Comunicados`
 
 ### 2. Configurar las Columnas en Cada Hoja
 
@@ -156,26 +157,30 @@ Asegúrate de que la primera fila de cada hoja contenga los siguientes encabezad
 
 La hoja `Config` te permite personalizar varios aspectos de la aplicación sin modificar el código:
 
-| Key                             | Descripción                                                                                                | Ejemplo de Value                                          |
-| :------------------------------ | :--------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------- |
-| `APP_TITLE`                     | El título que se muestra en la aplicación y en la pestaña del navegador.                                     | `Dashboard del Equipo Alfa`                               |
-| `APP_SUBTITLE`                  | El subtítulo que se muestra debajo del título principal.                                                     | `Seguimiento Ágil Q3`                                     |
-| `HELP_CHAT_URL`                 | La URL a la que enlazará el botón flotante de "Ayuda".                                                       | `https://chat.google.com/room/ABCXYZ`                     |
-| `TEAM_MESSAGE_CARD_TITLE`       | El título de la tarjeta de "Comunicados del Equipo".                                                          | `Últimos Comunicados`                                     |
-| `IMPEDIMENT_NOTIFICATION_EMAIL` | La dirección de correo a la que se enviarán notificaciones de nuevos impedimentos. Dejar en blanco para no enviar. | `jefe.de.proyecto@ejemplo.com`                            |
-| `SPRINT_END_DATE`               | Fecha de finalización del sprint actual para el contador. Formato: `YYYY-MM-DDTHH:MM:SS` o `YYYY-MM-DD`.     | `2025-05-30`                                              |
-| `SPRINT_INFO_YEAR`              | Año del sprint (ej: `2024`).                                                                                 | `2024`                                                    |
-| `SPRINT_INFO_QUARTER`           | Trimestre del sprint (ej: `Q2`).                                                                             | `Q2`                                                      |
-| `SPRINT_INFO_NUMBER_IN_QUARTER` | Número del sprint dentro del trimestre (ej: `3`).                                                              | `3`                                                       |
-| `CALENDAR_ID_SHEET`             | Nombre de la hoja de cálculo que contiene los eventos próximos (ej: `UpcomingEvents`).                       | `UpcomingEvents`                                          |
-| `MAX_CALENDAR_EVENTS`           | Número máximo de eventos próximos a mostrar.                                                                 | `5`                                                       |
-| `TEAM_MOOD_DEFAULT_EMOJI`       | Emoji por defecto para el mood del equipo si no hay datos.                                                   | `🚀`                                                      |
+| Key                             | Descripción                                                                                                 | Ejemplo de Value                             |
+| :------------------------------ | :---------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| `APP_TITLE`                     | El título que se muestra en la aplicación y en la pestaña del navegador.                                    | `Dashboard del Equipo Alfa`                  |
+| `APP_SUBTITLE`                  | El subtítulo que se muestra debajo del título principal.                                                    | `Seguimiento Ágil Q3`                      |
+| `HELP_CHAT_URL`                 | La URL a la que enlazará el botón flotante de "Ayuda".                                                      | `https://chat.google.com/room/ABCXYZ`        |
+| `TEAM_MESSAGE_CARD_TITLE`       | El título de la tarjeta de "Comunicados del Equipo".                                                        | `Últimos Comunicados`                      |
+| `IMPEDIMENT_NOTIFICATION_EMAIL` | La dirección de correo a la que se enviarán notificaciones de nuevos impedimentos. Dejar en blanco para no enviar. | `jefe.de.proyecto@ejemplo.com`             |
+| `SPRINT_END_DATE`               | Fecha de finalización del sprint actual para el contador. Formato: `YYYY-MM-DDTHH:MM:SS` o `YYYY-MM-DD`.      | `2025-05-30`                                 |
+| `SPRINT_INFO_YEAR`              | Año del sprint (ej: `2024`).                                                                                | `2024`                                       |
+| `SPRINT_INFO_QUARTER`           | Trimestre del sprint (ej: `Q2`).                                                                            | `Q2`                                         |
+| `SPRINT_INFO_NUMBER_IN_QUARTER` | Número del sprint dentro del trimestre (ej: `3`).                                                           | `3`                                          |
+| `CALENDAR_ID_SHEET`             | Nombre de la hoja de cálculo que contiene los eventos próximos (ej: `UpcomingEvents`).                      | `UpcomingEvents`                             |
+| `MAX_CALENDAR_EVENTS`           | Número máximo de eventos próximos a mostrar.                                                                | `5`                                          |
+| `TEAM_MOOD_DEFAULT_EMOJI`       | Emoji por defecto para el mood del equipo si no hay datos.                                                  | `🚀`                                         |
+| `APP_DATA_SOURCE_URL`           | **URL de la hoja de cálculo principal para el enlace en el pie de página.** | `https://docs.google.com/spreadsheets/d/ABC...` |
+| `UPCOMING_EVENTS_EDIT_URL`      | **URL para editar directamente los datos de Próximos Eventos (ej. enlace a la hoja).** | `https://docs.google.com/spreadsheets/d/ABC...#gid=123` |
+| `COMMUNICATIONS_EDIT_URL`       | **URL para editar directamente los datos de Comunicados.** | `https://docs.google.com/spreadsheets/d/ABC...#gid=456` |
+| `QUICKLINKS_EDIT_URL`           | **URL para editar directamente los datos de Enlaces Útiles.** | `https://docs.google.com/spreadsheets/d/ABC...#gid=789` |
 
 ## Uso de la Aplicación
 
 * Abre la URL de la aplicación web obtenida durante el despliegue.
 * Los datos se cargarán desde tu Google Sheet.
-* Usa los filtros para refinar la vista de Features.
+* Usa los filtros para refinar la vista de Features, incluyendo el nuevo filtro de "Actividad".
 * Interactúa con las tarjetas de Mood, Impedimentos, Comunicados, etc.
 * Usa los buscadores en "Enlaces Útiles" y "Comunicados del Equipo" para encontrar información rápidamente.
 
@@ -189,4 +194,3 @@ La hoja `Config` te permite personalizar varios aspectos de la aplicación sin m
     * Abre la consola de desarrollador de tu navegador (`Ctrl+Shift+J` o `Cmd+Opt+J`) para ver errores del lado del cliente.
 * **Los datos no se actualizan:** Asegúrate de que los datos en tu Google Sheet estén guardados. La aplicación carga los datos cada vez que se abre o actualiza la página.
 * **Permisos:** Si realizas cambios significativos en el script que requieran nuevos permisos (ej: usar un nuevo servicio de Google), puede que necesites volver a autorizar la aplicación desplegándola de nuevo.
-
