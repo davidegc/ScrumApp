@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = 'TU_ID_DE_HOJA_DE_CALCULO_AQUI'; // Mantén tu ID aquí
+const SPREADSHEET_ID = '13yLIw2Q8W-zYUYUmHt6RmeBQpYtuNSGEU-PaubCmhd4';
 
 const FEATURES_SHEET_NAME = 'Features';
 const USER_STORIES_SHEET_NAME = 'UserStories';
@@ -26,32 +26,17 @@ const APP_CONFIG_DEFAULTS = {
   QUICKLINKS_EDIT_URL: '#'
 };
 
-/**
- * Función principal que se ejecuta cuando se accede a la aplicación web.
- * @param {Object} e - El objeto de evento.
- * @return {HtmlOutput} El servicio HTML para renderizar la página.
- */
 function doGet(e) {
   return HtmlService.createTemplateFromFile('Index').evaluate()
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
-/**
- * Incluye el contenido de otro archivo HTML (para plantillas).
- * @param {string} filename - El nombre del archivo HTML a incluir.
- * @return {string} El contenido del archivo HTML.
- */
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-/**
- * Obtiene todos los datos necesarios de las hojas de cálculo.
- * @return {Object} Un objeto con todos los datos de la aplicación o un objeto de error.
- */
 function getAllSheetData() {
   let ss;
-  Logger.log(`Iniciando getAllSheetData para SPREADSHEET_ID: ${SPREADSHEET_ID}`);
   const defaultReturnValue = {
     error: null, features: [], announcements: [], config: { ...APP_CONFIG_DEFAULTS }, quickLinks: [],
     impediments: [], currentUserEmail: getActiveUserEmailSafely(),
@@ -64,23 +49,17 @@ function getAllSheetData() {
   try {
     if (!SPREADSHEET_ID || SPREADSHEET_ID === 'TU_SPREADSHEET_ID_AQUI' || SPREADSHEET_ID.length < 20) {
       const errMsg = `Error Crítico: SPREADSHEET_ID no está configurado o es inválido. ID actual: "${SPREADSHEET_ID}"`;
-      console.error(errMsg);
-      Logger.log(errMsg);
       return { ...defaultReturnValue, error: errMsg };
     }
     ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     if (!ss) {
       const errMsg = `Error Crítico: No se pudo abrir Spreadsheet con ID: ${SPREADSHEET_ID}. Verifica ID, existencia y permisos.`;
-      console.error(errMsg);
-      Logger.log(errMsg);
       return { ...defaultReturnValue, error: errMsg };
     }
-    Logger.log(`Spreadsheet "${ss.getName()}" abierto.`);
 
     const getDataFromSheet = (sheetName, defaultValue = []) => {
       const sheet = ss.getSheetByName(sheetName);
       if (!sheet) {
-        Logger.log(`Advertencia: Hoja "${sheetName}" no encontrada. Usando valor por defecto.`);
         return defaultValue;
       }
       return getSheetDataAsObjects(sheet, sheetName);
@@ -108,7 +87,6 @@ function getAllSheetData() {
     if (typeof config.MAX_CALENDAR_EVENTS === 'undefined' || config.MAX_CALENDAR_EVENTS < 1) {
       config.MAX_CALENDAR_EVENTS = 10;
     }
-    Logger.log(`Configuración cargada: ${JSON.stringify(config)}`);
 
     let allAnnouncements = getDataFromSheet(ANNOUNCEMENTS_SHEET_NAME, []);
     let announcementsToClient = allAnnouncements.sort((a, b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity));
@@ -127,8 +105,6 @@ function getAllSheetData() {
         const dateB = b.Date ? new Date(b.Date) : new Date(0);
         return dateB.getTime() - dateA.getTime();
       });
-    Logger.log(`Comunicados procesados: ${communicationsData.length}`);
-
 
     const allFeaturesForImpediments = featuresData
       .map(f => ({ ID: f.ID, Name: f.Name }))
@@ -136,9 +112,32 @@ function getAllSheetData() {
 
     const nonDeployedUserStories = userStoriesData
       .filter(us => String(us.Status || '').trim().toLowerCase() !== 'deployed')
-      .map(us => ({ ID: us.ID, Name: us.Name, FeatureID: us.FeatureID }))
-      .sort((a, b) => (a.Name || "").localeCompare(b.Name || ""));
+      .map(us => {
+        const parentFeature = featuresData.find(f => String(f.ID) === String(us.FeatureID));
+        return {
+          ...us,
+          Q: parentFeature ? parentFeature.Q : null,
+          FeatureURL: parentFeature ? parentFeature.URL : null // Añadir URL de la Feature padre
+        };
+      })
+      .sort((a, b) => {
+        const qA = String(a.Q || '').toUpperCase();
+        const qB = String(b.Q || '').toUpperCase();
+        if (qA !== qB) return qA.localeCompare(qB);
 
+        const sprintA = String(a.Sprint || '');
+        const sprintB = String(b.Sprint || '');
+        const numA = parseInt(sprintA.replace(/[^0-9]/g, ''), 10);
+        const numB = parseInt(sprintB.replace(/[^0-9]/g, ''), 10);
+
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+            return numA - numB;
+        }
+        const sprintComp = String(sprintA).localeCompare(String(sprintB), undefined, {numeric: true, sensitivity: 'base'});
+        if (sprintComp !== 0) return sprintComp;
+        
+        return (a.Name || "").localeCompare(b.Name || "");
+      });
 
     if (featuresData.length > 0) {
       featuresData = featuresData.map(feature => {
@@ -147,37 +146,37 @@ function getAllSheetData() {
         let associatedDependencies = dependenciesData.filter(dep => String(dep.FeatureID) === featureIdStr);
 
         associatedUserStories.sort((a, b) => {
-          const sprintA = String(a.Sprint || '').trim();
-          const sprintB = String(b.Sprint || '').trim();
-          const nameA = String(a.Name || '').toLowerCase();
-          const nameB = String(b.Name || '').toLowerCase();
+          const sprintA_us = String(a.Sprint || '').trim();
+          const sprintB_us = String(b.Sprint || '').trim();
+          const nameA_us = String(a.Name || '').toLowerCase();
+          const nameB_us = String(b.Name || '').toLowerCase();
 
-          if (sprintA !== sprintB) {
-            const numA = parseInt(sprintA.replace(/[^0-9]/g, ''), 10);
-            const numB = parseInt(sprintB.replace(/[^0-9]/g, ''), 10);
-            if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
-              return numB - numA;
+          if (sprintA_us !== sprintB_us) {
+            const numA_val_us = parseInt(sprintA_us.replace(/[^0-9]/g, ''), 10);
+            const numB_val_us = parseInt(sprintB_us.replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(numA_val_us) && !isNaN(numB_val_us) && numA_val_us !== numB_val_us) {
+              return numB_val_us - numA_val_us;
             }
-            return sprintB.localeCompare(sprintA, undefined, {numeric: true, sensitivity: 'base'});
+            return sprintB_us.localeCompare(sprintA_us, undefined, {numeric: true, sensitivity: 'base'});
           }
-          return nameB.localeCompare(nameA);
+          return nameB_us.localeCompare(nameA_us);
         });
 
         associatedDependencies.sort((a, b) => {
-          const sprintA = String(a.Sprint || '').trim();
-          const sprintB = String(b.Sprint || '').trim();
-          const nameA = String(a.Name || '').toLowerCase();
-          const nameB = String(b.Name || '').toLowerCase();
+          const sprintA_dep = String(a.Sprint || '').trim();
+          const sprintB_dep = String(b.Sprint || '').trim();
+          const nameA_dep = String(a.Name || '').toLowerCase();
+          const nameB_dep = String(b.Name || '').toLowerCase();
 
-          if (sprintA !== sprintB) {
-            const numA = parseInt(sprintA.replace(/[^0-9]/g, ''), 10);
-            const numB = parseInt(sprintB.replace(/[^0-9]/g, ''), 10);
-            if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
-              return numB - numA;
+          if (sprintA_dep !== sprintB_dep) {
+            const numA_val_dep = parseInt(sprintA_dep.replace(/[^0-9]/g, ''), 10);
+            const numB_val_dep = parseInt(sprintB_dep.replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(numA_val_dep) && !isNaN(numB_val_dep) && numA_val_dep !== numB_val_dep) {
+              return numB_val_dep - numA_val_dep;
             }
-            return sprintB.localeCompare(sprintA, undefined, {numeric: true, sensitivity: 'base'});
+            return sprintB_dep.localeCompare(sprintA_dep, undefined, {numeric: true, sensitivity: 'base'});
           }
-          return nameB.localeCompare(nameA);
+          return nameB_dep.localeCompare(nameA_dep);
         });
 
         return {
@@ -190,7 +189,7 @@ function getAllSheetData() {
       });
     }
 
-    const calculatePodium = (items, itemType = 'item') => { // Añadido itemType para loggeo
+    const calculatePodium = (items) => { 
       const podium = [];
       if (items && items.length > 0) {
         const responsibles = [...new Set(items.map(item => item.Responsible).filter(Boolean))];
@@ -202,20 +201,19 @@ function getAllSheetData() {
             podium.push({
               responsible: responsible,
               progress: Math.round((deployedItems / totalItems) * 100),
-              deployedItems: deployedItems, // Requerimiento Podios
-              totalItems: totalItems        // Requerimiento Podios
+              deployedItems: deployedItems, 
+              totalItems: totalItems      
             });
           }
         });
         podium.sort((a, b) => b.progress - a.progress);
       }
-      // Logger.log(`Podium para ${itemType}: ${JSON.stringify(podium)}`);
       return podium;
     };
 
-    const podiumDataFeatures = calculatePodium(featuresData, 'Features');
-    const podiumDataUserStories = calculatePodium(userStoriesData, 'UserStories');
-    const podiumDataDependencies = calculatePodium(dependenciesData, 'Dependencies');
+    const podiumDataFeatures = calculatePodium(featuresData);
+    const podiumDataUserStories = calculatePodium(userStoriesData);
+    const podiumDataDependencies = calculatePodium(dependenciesData);
 
     const allQsList = [...new Set(featuresData.map(f => f.Q).filter(Boolean))].sort();
     const allSprintsList = [...new Set(
@@ -224,14 +222,13 @@ function getAllSheetData() {
         ...dependenciesData.map(dep => dep.Sprint)
       ].filter(Boolean)
     )].sort((a, b) => {
-        const numA = parseInt(String(a).replace(/[^0-9]/g, ''), 10);
-        const numB = parseInt(String(b).replace(/[^0-9]/g, ''), 10);
-        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
-            return numA - numB;
+        const numA_sprint = parseInt(String(a).replace(/[^0-9]/g, ''), 10);
+        const numB_sprint = parseInt(String(b).replace(/[^0-9]/g, ''), 10);
+        if (!isNaN(numA_sprint) && !isNaN(numB_sprint) && numA_sprint !== numB_sprint) {
+            return numA_sprint - numB_sprint;
         }
         return String(a).localeCompare(String(b), undefined, {numeric: true, sensitivity: 'base'});
     });
-
 
     const upcomingEvents = getUpcomingEventsFromSheet(config.CALENDAR_ID_SHEET, config.MAX_CALENDAR_EVENTS);
 
@@ -253,39 +250,26 @@ function getAllSheetData() {
       upcomingEvents: upcomingEvents,
       communications: communicationsData
     };
-
     return dataToReturn;
 
   } catch (error) {
-    Logger.log(`Error en getAllSheetData: ${error.toString()} ${error.stack}`);
-    console.error(`Error en getAllSheetData: ${error.toString()} ${error.stack}`);
     return { ...defaultReturnValue, error: `Error en getAllSheetData: ${error.toString()}` };
   }
 }
 
-/**
- * Obtiene el email del usuario activo de forma segura.
- * @return {string|null} El email del usuario o null si no se puede obtener.
- */
 function getActiveUserEmailSafely() {
   try {
     return Session.getActiveUser() ? Session.getActiveUser().getEmail() : null;
   } catch (e) {
-    Logger.log("No se pudo obtener email: " + e.toString());
     return null;
   }
 }
 
-/**
- * Obtiene el mood general del equipo para el día actual.
- * @return {string} El emoji del mood más frecuente.
- */
 function getTeamMood() {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const moodSheet = ss.getSheetByName(MOODS_SHEET_NAME);
     if (!moodSheet || moodSheet.getLastRow() < 2) {
-      Logger.log("Hoja de Moods no encontrada o vacía.");
       return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
     }
 
@@ -301,7 +285,6 @@ function getTeamMood() {
     });
 
     if (todaysMoods.length === 0) {
-      Logger.log("No hay moods para hoy.");
       return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
     }
 
@@ -319,20 +302,12 @@ function getTeamMood() {
         maxCount = moodCounts[mood];
       }
     }
-    Logger.log(`Mood más frecuente de hoy: ${mostFrequentMood} (conteo: ${maxCount})`);
     return mostFrequentMood;
-
   } catch (error) {
-    Logger.log(`Error en getTeamMood: ${error.toString()}`);
     return APP_CONFIG_DEFAULTS.TEAM_MOOD_DEFAULT_EMOJI || "😊";
   }
 }
 
-/**
- * Guarda el mood del usuario.
- * @param {string} moodEmoji - El emoji seleccionado por el usuario.
- * @return {Object} Resultado de la operación.
- */
 function saveUserMood(moodEmoji) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -340,20 +315,13 @@ function saveUserMood(moodEmoji) {
     if (!moodSheet) throw new Error(`Hoja '${MOODS_SHEET_NAME}' no encontrada.`);
 
     moodSheet.appendRow([new Date(), getActiveUserEmailSafely(), moodEmoji]);
-    Logger.log(`Mood guardado: ${moodEmoji}`);
     const newTeamMood = getTeamMood();
     return { success: true, message: 'Mood guardado.', newTeamMood: newTeamMood };
   } catch (error) {
-    Logger.log(`Error en saveUserMood: ${error.toString()}`);
     return { success: false, message: `Error al guardar mood: ${error.toString()}` };
   }
 }
 
-/**
- * Guarda un nuevo impedimento y notifica por email.
- * @param {Object} impedimentData - Datos del impedimento (title, description, associatedFeatureID, associatedUserStoryID).
- * @return {Object} Resultado de la operación.
- */
 function saveImpediment(impedimentData) {
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -368,15 +336,9 @@ function saveImpediment(impedimentData) {
     const title = impedimentData.title;
 
     impedimentsSheet.appendRow([
-      timestamp,
-      userEmail,
-      title,
-      impedimentData.description,
-      status,
-      associatedUserStoryID,
-      associatedFeatureID
+      timestamp, userEmail, title, impedimentData.description,
+      status, associatedUserStoryID, associatedFeatureID
     ]);
-    Logger.log(`Impedimento guardado por ${userEmail}: "${title}", F: ${associatedFeatureID}, HU: ${associatedUserStoryID}`);
 
     const configSheet = ss.getSheetByName(CONFIG_SHEET_NAME);
     let notificationEmail = APP_CONFIG_DEFAULTS.IMPEDIMENT_NOTIFICATION_EMAIL;
@@ -391,105 +353,58 @@ function saveImpediment(impedimentData) {
     if (notificationEmail) {
       try {
         let emailBody = `Se ha registrado un nuevo impedimento:\n\nTítulo (HU/Feature): ${title}\nDescripción: ${impedimentData.description}\n`;
-        if (associatedFeatureID) {
-          emailBody += `ID Feature Asociada: ${associatedFeatureID}\n`;
-        }
-        if (associatedUserStoryID) {
-          emailBody += `ID Historia de Usuario Asociada: ${associatedUserStoryID}\n`;
-        }
+        if (associatedFeatureID) emailBody += `ID Feature Asociada: ${associatedFeatureID}\n`;
+        if (associatedUserStoryID) emailBody += `ID Historia de Usuario Asociada: ${associatedUserStoryID}\n`;
         emailBody += `\nPor: ${userEmail || 'N/A'}\nFecha: ${timestamp.toLocaleString()}\nEstado: ${status}`;
-
-        MailApp.sendEmail({
-          to: notificationEmail,
-          subject: `Impedimento: ${title}`,
-          body: emailBody
-        });
-        Logger.log(`Notificación de impedimento enviada a: ${notificationEmail}`);
+        MailApp.sendEmail({ to: notificationEmail, subject: `Impedimento: ${title}`, body: emailBody });
       } catch (e) {
-        Logger.log(`Error al enviar email de notificación de impedimento: ${e.toString()}`);
+        // Silently fail email sending if needed, or log more verbosely
       }
-    } else {
-      Logger.log("Email de notificación de impedimentos no configurado en la hoja Config.");
     }
 
     const newImpediment = {
-      Timestamp: timestamp.toISOString(),
-      UserEmail: userEmail,
-      Title: title,
-      Description: impedimentData.description,
-      Status: status,
-      AssociatedUserStoryID: associatedUserStoryID,
-      AssociatedFeatureID: associatedFeatureID
+      Timestamp: timestamp.toISOString(), UserEmail: userEmail, Title: title,
+      Description: impedimentData.description, Status: status,
+      AssociatedUserStoryID: associatedUserStoryID, AssociatedFeatureID: associatedFeatureID
     };
     return { success: true, message: 'Impedimento guardado.', impediment: newImpediment };
   } catch (error) {
-    Logger.log(`Error en saveImpediment: ${error.toString()}`);
     return { success: false, message: `Error al guardar impedimento: ${error.toString()}` };
   }
 }
 
-/**
- * Obtiene los próximos eventos de una hoja de cálculo.
- * @param {string} sheetName - El nombre de la hoja que contiene los eventos.
- * @param {number} maxEvents - El número máximo de eventos a obtener.
- * @return {Array} Una lista de objetos de evento.
- */
 function getUpcomingEventsFromSheet(sheetName, maxEvents) {
-  if (!sheetName) {
-    Logger.log("Nombre de hoja para eventos no configurado. No se pueden obtener eventos.");
-    return [];
-  }
+  if (!sheetName) return [];
   try {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const eventSheet = ss.getSheetByName(sheetName);
-    if (!eventSheet) {
-      Logger.log(`Hoja de eventos '${sheetName}' no encontrada.`);
-      return [];
-    }
+    if (!eventSheet) return [];
+    
     const eventsData = getSheetDataAsObjects(eventSheet, sheetName);
     const now = new Date();
 
-    const formattedEvents = eventsData
+    return eventsData
       .filter(event => {
         if (!event.StartDate) return false;
-        try {
-          const startDate = new Date(event.StartDate);
-          return startDate >= now;
-        } catch (e) {
-          Logger.log(`Fecha inválida para evento '${event.EventTitle || event.title}': ${event.StartDate}`);
-          return false;
-        }
+        try { return new Date(event.StartDate) >= now; } 
+        catch (e) { return false; }
       })
       .sort((a, b) => new Date(a.StartDate) - new Date(b.StartDate))
       .slice(0, maxEvents)
       .map(event => {
-        let startISO = event.StartDate;
-        let endISO = event.EndDate;
-        if (event.StartDate instanceof Date) startISO = event.StartDate.toISOString();
-        if (event.EndDate instanceof Date) endISO = event.EndDate.toISOString();
-
+        let startISO = event.StartDate instanceof Date ? event.StartDate.toISOString() : event.StartDate;
+        let endISO = event.EndDate instanceof Date ? event.EndDate.toISOString() : event.EndDate;
         return {
           title: event.EventTitle || event.title || 'Evento sin título',
-          start: startISO,
-          end: endISO,
+          start: startISO, end: endISO,
           fullday: event.AllDayEvent === true || String(event.AllDayEvent).toLowerCase() === 'true'
         };
       });
-    Logger.log(`Eventos obtenidos de la hoja '${sheetName}': ${formattedEvents.length}`);
-    return formattedEvents;
   } catch (e) {
-    Logger.log(`Error al obtener eventos de la hoja '${sheetName}': ${e.toString()}`);
     return [];
   }
 }
 
-
-/**
- * Convierte los datos de una hoja en un array de objetos.
- * @param {SpreadsheetApp.Sheet} sheet - El objeto de la hoja de cálculo.
- * @param {string} sheetName - El nombre de la hoja (para logging y mapeo específico).
- * @return {Array<Object>} Un array de objetos representando las filas.
- */
 function getSheetDataAsObjects(sheet, sheetName) {
   if (!sheet) return [];
   const numRows = sheet.getLastRow();
@@ -502,15 +417,16 @@ function getSheetDataAsObjects(sheet, sheetName) {
 
   const headers = values[0].map(header => {
     let pHeader = String(header || "").trim();
-    if (pHeader === "Status Order") pHeader = "StatusOrder";
+    
+    if (pHeader === "Seguimiento") pHeader = "Responsible";
+    else if (pHeader === "Status Order") pHeader = "StatusOrder";
     else if (pHeader === "Jira Link") pHeader = "JiraLink";
     else if (pHeader === "Feature ID") pHeader = "FeatureID";
     else if (pHeader === "Tag Class") pHeader = "TagClass";
-    else if (pHeader === "Seguimiento") pHeader = "Responsible";
     else if (pHeader === "Show" || pHeader === "Mostrar") pHeader = "Show";
     else if (sheetName === ANNOUNCEMENTS_SHEET_NAME && pHeader === "Announcements: Text") pHeader = "Text";
     else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "Text") pHeader = "Text";
-    else if (sheetName === QUICKLINKS_SHEET_NAME && pHeader === "URL") pHeader = "URL";
+    else if ((sheetName === QUICKLINKS_SHEET_NAME || sheetName === COMMUNICATIONS_SHEET_NAME || sheetName === FEATURES_SHEET_NAME) && pHeader === "URL") pHeader = "URL";
     else if (pHeader === "Favorite") pHeader = "Favorite";
     else if (pHeader === "Q" || pHeader === "Quarter") pHeader = "Q";
     else if (pHeader === "Sprint" || pHeader === "Sprint Number") pHeader = "Sprint";
@@ -528,9 +444,8 @@ function getSheetDataAsObjects(sheet, sheetName) {
     else if (sheetName === UPCOMING_EVENTS_SHEET_NAME && (pHeader === "All Day Event" || pHeader === "AllDayEvent")) pHeader = "AllDayEvent";
     else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "Fecha") pHeader = "Date";
     else if (sheetName === COMMUNICATIONS_SHEET_NAME && (pHeader === "Comunicado" || pHeader === "Mensaje")) pHeader = "Message";
-    else if (sheetName === COMMUNICATIONS_SHEET_NAME && pHeader === "URL") pHeader = "URL";
-
-    pHeader = pHeader.replace(/[^a-zA-Z0-9_ ]/g, '').replace(/\s+/g, '');
+    
+    pHeader = pHeader.replace(/[^a-zA-Z0-9_]/g, '').replace(/\s+/g, ''); // Allow underscore
     return pHeader;
   });
 
@@ -547,9 +462,9 @@ function getSheetDataAsObjects(sheet, sheetName) {
 
       if (cellVal instanceof Date) {
         if (((sheetName === IMPEDIMENTS_SHEET_NAME || sheetName === MOODS_SHEET_NAME) && header === 'Timestamp') ||
-          ((sheetName === UPCOMING_EVENTS_SHEET_NAME || sheetName === COMMUNICATIONS_SHEET_NAME) && (header === 'StartDate' || header === 'EndDate' || header === 'Date'))
-        ) {
-          object[header] = cellVal;
+            ((sheetName === UPCOMING_EVENTS_SHEET_NAME || sheetName === COMMUNICATIONS_SHEET_NAME) && (header === 'StartDate' || header === 'EndDate' || header === 'Date'))
+           ) {
+          object[header] = cellVal; 
         } else {
           object[header] = Utilities.formatDate(cellVal, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss'Z'");
         }
@@ -563,36 +478,25 @@ function getSheetDataAsObjects(sheet, sheetName) {
                 if (parts.length === 3) {
                     let day, month, year;
                     year = parseInt(parts[2], 10);
+                    if (String(year).length === 2) year += 2000; 
                     if (parseInt(parts[0], 10) > 12 && parseInt(parts[1], 10) <= 12) {
-                        day = parseInt(parts[0], 10);
-                        month = parseInt(parts[1], 10);
+                        day = parseInt(parts[0], 10); month = parseInt(parts[1], 10);
                     } else if (parseInt(parts[1], 10) > 12 && parseInt(parts[0], 10) <= 12) {
-                        day = parseInt(parts[1], 10);
-                        month = parseInt(parts[0], 10);
-                    } else {
-                        month = parseInt(parts[0], 10);
-                        day = parseInt(parts[1], 10);
-                        if (month > 12) {
-                            month = parseInt(parts[1], 10);
-                            day = parseInt(parts[0], 10);
+                        day = parseInt(parts[1], 10); month = parseInt(parts[0], 10);
+                    } else { 
+                        month = parseInt(parts[0], 10); day = parseInt(parts[1], 10);
+                         if (month > 12 || day > 31) { 
+                            month = parseInt(parts[1], 10); day = parseInt(parts[0], 10);
                         }
                     }
-                    if (day && month && year) {
+                    if (day && month && year && month >=1 && month <=12 && day >=1 && day <=31) {
                          parsedDate = new Date(year, month - 1, day);
                     }
                 }
               }
             }
-
-            if (isNaN(parsedDate.getTime())) {
-              Logger.log(`Fecha string inválida en ${sheetName}, header ${header}: ${cellVal}. Se mantiene como string.`);
-              object[header] = cellVal;
-            } else {
-              object[header] = parsedDate;
-            }
-
+            object[header] = isNaN(parsedDate.getTime()) ? cellVal : parsedDate;
           } catch (e) {
-            Logger.log(`Error parseando fecha string en ${sheetName}, header ${header}: ${cellVal} - ${e}`);
             object[header] = cellVal;
           }
         } else {
@@ -605,18 +509,18 @@ function getSheetDataAsObjects(sheet, sheetName) {
       if (header === 'StatusOrder' || header === 'Order') {
         const numVal = parseFloat(cellVal);
         object[header] = (cellVal !== "" && cellVal !== null && !isNaN(numVal)) ? numVal : null;
-      } else if (header === 'ID' || header === 'FeatureID' || header === 'AssociatedUserStoryID' || header === 'AssociatedFeatureID' || header === 'Sprint') {
+      } else if (['ID', 'FeatureID', 'AssociatedUserStoryID', 'AssociatedFeatureID', 'Sprint'].includes(header)) {
         object[header] = (cellVal !== "" && cellVal !== null) ? String(cellVal).trim() : null;
-      } else if (header === 'Show' || header === 'Favorite' || header === 'AllDayEvent') {
+      } else if (['Show', 'Favorite', 'AllDayEvent'].includes(header)) {
         object[header] = (String(cellVal).trim().toLowerCase() === 'true' || cellVal === true);
       }
     });
+
     if (hasData) {
       if (object.Timestamp instanceof Date) object.Timestamp = object.Timestamp.toISOString();
       if (object.StartDate instanceof Date) object.StartDate = object.StartDate.toISOString();
       if (object.EndDate instanceof Date) object.EndDate = object.EndDate.toISOString();
       if (object.Date instanceof Date) object.Date = object.Date.toISOString();
-
       objects.push(object);
     }
   }

@@ -5,6 +5,7 @@ Esta aplicación web, construida con Google Apps Script, sirve como un dashboard
 ## Características
 
 * Visualización de Features, Historias de Usuario y Dependencias.
+* **Tabla de Historias de Usuario Pendientes:** Muestra las historias no desplegadas con columnas específicas (Nombre, Seguimiento, ID Feature, ID Historia, Sprint, Estatus, Prioridad), ancho de columnas uniforme y scroll vertical.
 * **Filtros globales por Q, Sprint, Actividad (Feature, Historia, Dependencia), Seguimiento (Responsable) y Estatus.**
 * Barras de progreso generales para la sección de Features, **mostrando conteo de Features, Historias de Usuario y Dependencias consideradas en el progreso**, basadas en el estado "Deployed".
 * Podios de progreso para Features, Historias de Usuario y Dependencias por responsable, **mostrando conteo de ítems desplegados sobre el total**.
@@ -157,20 +158,20 @@ Asegúrate de que la primera fila de cada hoja contenga los siguientes encabezad
 
 La hoja `Config` te permite personalizar varios aspectos de la aplicación sin modificar el código:
 
-| Key                             | Descripción                                                                                                 | Ejemplo de Value                             |
-| :------------------------------ | :---------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
+| Key                             | Descripción                                                                                                | Ejemplo de Value                             |
+| :------------------------------ | :--------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
 | `APP_TITLE`                     | El título que se muestra en la aplicación y en la pestaña del navegador.                                    | `Dashboard del Equipo Alfa`                  |
-| `APP_SUBTITLE`                  | El subtítulo que se muestra debajo del título principal.                                                    | `Seguimiento Ágil Q3`                      |
+| `APP_SUBTITLE`                  | El subtítulo que se muestra debajo del título principal.                                                     | `Seguimiento Ágil Q3`                        |
 | `HELP_CHAT_URL`                 | La URL a la que enlazará el botón flotante de "Ayuda".                                                      | `https://chat.google.com/room/ABCXYZ`        |
-| `TEAM_MESSAGE_CARD_TITLE`       | El título de la tarjeta de "Comunicados del Equipo".                                                        | `Últimos Comunicados`                      |
+| `TEAM_MESSAGE_CARD_TITLE`       | El título de la tarjeta de "Comunicados del Equipo".                                                        | `Últimos Comunicados`                        |
 | `IMPEDIMENT_NOTIFICATION_EMAIL` | La dirección de correo a la que se enviarán notificaciones de nuevos impedimentos. Dejar en blanco para no enviar. | `jefe.de.proyecto@ejemplo.com`             |
 | `SPRINT_END_DATE`               | Fecha de finalización del sprint actual para el contador. Formato: `YYYY-MM-DDTHH:MM:SS` o `YYYY-MM-DD`.      | `2025-05-30`                                 |
-| `SPRINT_INFO_YEAR`              | Año del sprint (ej: `2024`).                                                                                | `2024`                                       |
-| `SPRINT_INFO_QUARTER`           | Trimestre del sprint (ej: `Q2`).                                                                            | `Q2`                                         |
-| `SPRINT_INFO_NUMBER_IN_QUARTER` | Número del sprint dentro del trimestre (ej: `3`).                                                           | `3`                                          |
-| `CALENDAR_ID_SHEET`             | Nombre de la hoja de cálculo que contiene los eventos próximos (ej: `UpcomingEvents`).                      | `UpcomingEvents`                             |
-| `MAX_CALENDAR_EVENTS`           | Número máximo de eventos próximos a mostrar.                                                                | `5`                                          |
-| `TEAM_MOOD_DEFAULT_EMOJI`       | Emoji por defecto para el mood del equipo si no hay datos.                                                  | `🚀`                                         |
+| `SPRINT_INFO_YEAR`              | Año del sprint (ej: `2024`).                                                                               | `2024`                                       |
+| `SPRINT_INFO_QUARTER`           | Trimestre del sprint (ej: `Q2`).                                                                           | `Q2`                                         |
+| `SPRINT_INFO_NUMBER_IN_QUARTER` | Número del sprint dentro del trimestre (ej: `3`).                                                          | `3`                                          |
+| `CALENDAR_ID_SHEET`             | Nombre de la hoja de cálculo que contiene los eventos próximos (ej: `UpcomingEvents`).                       | `UpcomingEvents`                             |
+| `MAX_CALENDAR_EVENTS`           | Número máximo de eventos próximos a mostrar.                                                                 | `5`                                          |
+| `TEAM_MOOD_DEFAULT_EMOJI`       | Emoji por defecto para el mood del equipo si no hay datos.                                                   | `🚀`                                         |
 | `APP_DATA_SOURCE_URL`           | **URL de la hoja de cálculo principal para el enlace en el pie de página.** | `https://docs.google.com/spreadsheets/d/ABC...` |
 | `UPCOMING_EVENTS_EDIT_URL`      | **URL para editar directamente los datos de Próximos Eventos (ej. enlace a la hoja).** | `https://docs.google.com/spreadsheets/d/ABC...#gid=123` |
 | `COMMUNICATIONS_EDIT_URL`       | **URL para editar directamente los datos de Comunicados.** | `https://docs.google.com/spreadsheets/d/ABC...#gid=456` |
@@ -180,7 +181,7 @@ La hoja `Config` te permite personalizar varios aspectos de la aplicación sin m
 
 * Abre la URL de la aplicación web obtenida durante el despliegue.
 * Los datos se cargarán desde tu Google Sheet.
-* Usa los filtros para refinar la vista de Features, incluyendo el nuevo filtro de "Actividad".
+* Usa los filtros para refinar la vista de Features e Historias Pendientes, incluyendo el filtro de "Actividad".
 * Interactúa con las tarjetas de Mood, Impedimentos, Comunicados, etc.
 * Usa los buscadores en "Enlaces Útiles" y "Comunicados del Equipo" para encontrar información rápidamente.
 
@@ -194,3 +195,21 @@ La hoja `Config` te permite personalizar varios aspectos de la aplicación sin m
     * Abre la consola de desarrollador de tu navegador (`Ctrl+Shift+J` o `Cmd+Opt+J`) para ver errores del lado del cliente.
 * **Los datos no se actualizan:** Asegúrate de que los datos en tu Google Sheet estén guardados. La aplicación carga los datos cada vez que se abre o actualiza la página.
 * **Permisos:** Si realizas cambios significativos en el script que requieran nuevos permisos (ej: usar un nuevo servicio de Google), puede que necesites volver a autorizar la aplicación desplegándola de nuevo.
+
+## Changelog
+
+### [Fecha de la Actualización - ej: 2024-05-22]
+* **Nueva Característica: Tabla de Historias de Usuario Pendientes**
+    * Se ha añadido una nueva tabla debajo de los filtros globales para mostrar específicamente las Historias de Usuario que no están en estado "Deployed".
+    * **Columnas mostradas:** Nombre (texto plano, sin URL), Seguimiento, ID Feature (con enlace a la URL de la Feature si está disponible), ID Historia (con enlace a JiraLink si está disponible), Sprint, Estatus (con badge de color) y Prioridad (con tag).
+    * Las columnas tienen un ancho distribuido uniformemente.
+    * La tabla tiene un alto máximo predefinido (aproximadamente para 4-5 filas visibles) con una barra de desplazamiento vertical si el contenido excede este alto, permitiendo ver todas las historias pendientes sin alargar excesivamente la página.
+    * Esta tabla se actualiza dinámicamente con los filtros globales aplicados (Q, Sprint, Seguimiento, Estatus, y término de búsqueda general). El filtro de "Actividad" en "Feature" o "Dependency" ocultará esta tabla ya que se enfoca en Historias.
+* **Mejoras en `Code.gs`**:
+    * Se ha optimizado la obtención de datos para `nonDeployedUserStories` para incluir `FeatureURL` (URL de la Feature padre) para poder enlazar el ID de la Feature en la nueva tabla.
+    * Se ha revisado el mapeo de cabeceras en `getSheetDataAsObjects` para asegurar la correcta asignación de la columna "URL" de la hoja "Features".
+* **Actualizaciones en `Index.html`**:
+    * Se ha añadido la estructura HTML y los estilos CSS para la nueva tabla de "Historias de Usuario Pendientes", incluyendo el `max-height` y `overflow-y: auto` para el scroll.
+    * Se ha modificado la función `renderPendingUserStories` para construir las filas de la tabla con las nuevas columnas, el orden especificado y los enlaces correspondientes.
+    * Se han ajustado los anchos de las columnas en el `<thead>` de la nueva tabla para una distribución uniforme.
+    * Se han actualizado los encabezados de columna en la tabla de Features y sus tablas anidadas para usar "Seguimiento" en lugar de "Responsable" para consistencia con la terminología del usuario.

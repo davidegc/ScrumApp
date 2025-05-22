@@ -18,7 +18,6 @@
             .app-header-title-section { text-align: left; }
             .app-header-user-section { text-align: right; }
         }
-
         .card { background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; overflow: hidden; }
         .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
         .card-header { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
@@ -26,72 +25,24 @@
         .card-header .counter { font-size: 0.875rem; font-weight: 500; color: #4b5563; background-color: #e5e7eb; padding: 4px 8px; border-radius: 9999px; margin-left: 10px; }
         .edit-link-icon-wrapper { margin-left: 8px; color: #6b7280; }
         .edit-link-icon-wrapper:hover { color: #3b82f6; }
-        
         .search-container { padding: 0px 20px 12px 20px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
         .search-input-wrapper { position: relative; display: flex; align-items: center; }
         .search-input-icon { position: absolute; left: 10px; color: #9ca3af; }
-        .search-input-card {
-            padding: 8px 10px 8px 35px; 
-            border: 1px solid #d1d5db; 
-            border-radius: 6px; 
-            font-size: 0.875rem; 
-            color: #374151; 
-            background-color: #ffffff; 
-            width: 100%; 
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
-        }
-        .search-input-card:focus {
-            border-color: #3b82f6;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-        }
-
+        .search-input-card { padding: 8px 10px 8px 35px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; color: #374151; background-color: #ffffff; width: 100%; box-shadow: inset 0 1px 2px rgba(0,0,0,0.075); }
+        .search-input-card:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
         .general-progress-container { padding: 12px 20px; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; }
         .general-progress-bar-bg { background-color: #e5e7eb; border-radius: 9999px; height: 0.75rem; }
         .general-progress-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out; }
         .general-progress-text { font-size: 0.75rem; font-weight: 500; color: #4b5563; }
-        
         .announcements-container { margin-bottom: 1rem; }
-        .announcement-bubble { 
-            padding: 16px 20px; 
-            border-radius: 8px; margin-bottom: 1rem; 
-            position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            display: flex; align-items: center; 
-            border-left-width: 5px; 
-            border-left-style: solid;
-            background-color: #fffbeb; 
-            border-color: #f59e0b;  
-            color: #b45309;      
-        }
-        .announcement-content { 
-            flex-grow: 1; font-size: 0.95rem; 
-            font-weight:500; margin-right: 10px; 
-            text-align: center;
-        }
+        .announcement-bubble { padding: 16px 20px; border-radius: 8px; margin-bottom: 1rem; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; border-left-width: 5px; border-left-style: solid; background-color: #fffbeb; border-color: #f59e0b; color: #b45309; }
+        .announcement-content { flex-grow: 1; font-size: 0.95rem; font-weight:500; margin-right: 10px; text-align: center; }
         .announcement-content a { font-weight: 600; text-decoration: none; color: #92400e; } 
         .announcement-content a:hover { text-decoration: underline; }
-        .announcement-close-btn { 
-            background: none; border: none; font-size: 1.3rem; 
-            cursor: pointer; padding: 0; line-height: 1; color: #f59e0b; 
-            margin-left: auto;
-        }
+        .announcement-close-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; padding: 0; line-height: 1; color: #f59e0b; margin-left: auto; }
         .announcement-close-btn:hover { color: #b45309; }
-
-        .announcement-bubble.vibrating {
-            animation: vibrate-intermittent 4s ease-in-out infinite;
-        }
-
-        @keyframes vibrate-intermittent {
-            0% { transform: translateX(0); }
-            2% { transform: translateX(-2px); }
-            4% { transform: translateX(2px); }
-            6% { transform: translateX(-2px); }
-            8% { transform: translateX(2px); }
-            10% { transform: translateX(0); } 
-            100% { transform: translateX(0); }
-        }
-
-
+        .announcement-bubble.vibrating { animation: vibrate-intermittent 4s ease-in-out infinite; }
+        @keyframes vibrate-intermittent { 0% { transform: translateX(0); } 2% { transform: translateX(-2px); } 4% { transform: translateX(2px); } 6% { transform: translateX(-2px); } 8% { transform: translateX(2px); } 10% { transform: translateX(0); } 100% { transform: translateX(0); } }
         .filters-wrapper { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem; background-color: transparent; border-radius: 8px; align-items: flex-end; }
         .filter-container { display: flex; flex-direction: column; gap: 0.25rem; flex-grow: 1; min-width: 150px; }
         .filter-container label { font-size: 0.875rem; font-weight: 500; color: #d1d5db; }
@@ -100,14 +51,15 @@
         #clear-filters-btn { padding: 6px 12px; background-color: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease; height: 34px; flex-shrink: 0; }
         #clear-filters-btn:hover { background-color: #5a636e; }
         #clear-filters-btn i { margin-right: 4px; }
-
-        .features-table-container { background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto;}
-        .features-table { width: 100%; border-collapse: collapse; color: #1f2937; table-layout: fixed; }
-        .features-table th, .features-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.875rem; vertical-align: middle; word-break: break-word; }
-        .features-table th { background-color: #f9fafb; font-weight: 600; }
+        .data-table-container { background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; color: #1f2937;}
+        .data-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .data-table th, .data-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 0.875rem; vertical-align: middle; word-break: break-word; }
+        .data-table th { background-color: #f9fafb; font-weight: 600; position: sticky; top: 0; z-index: 10;}
+        .pending-stories-scrollable-container { max-height: 220px; overflow-y: auto; }
+        .features-table-container { }
+        .features-table { }
         .col-uniform { width: 23.75%; } 
         .col-expand { width: 5%; text-align: center; }
-
         .feature-row td { background-color: #fdfdfe; }
         .feature-row.even td { background-color: #f7f8f9; }
         .feature-row:hover td { background-color: #eff6ff; }
@@ -116,17 +68,13 @@
         .feature-details-row td { padding: 0; background-color: #ffffff; }
         .feature-details-content { padding: 15px; border-top: 2px solid #60a5fa; }
         .feature-details-content h4 { font-size: 0.95rem; font-weight: 600; color: #374151; margin-top: 0; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e0e0;}
-        
         .nested-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; }
         .nested-table th, .nested-table td { padding: 8px 10px; text-align: left; border: 1px solid #e5e7eb; font-size: 0.8rem; word-break: break-word; }
-        .nested-table th { background-color: #f3f4f6; font-weight: 500; }
-        
-        .nested-table td a { color: #2563eb; text-decoration: none; }
-        .nested-table td a:hover { text-decoration: underline; }
-        
+        .nested-table th { background-color: #f3f4f6; font-weight: 500; position: sticky; top: 0; z-index: 5;}
+        .nested-table td a, .data-table td a { color: #2563eb; text-decoration: none; }
+        .nested-table td a:hover, .data-table td a:hover { text-decoration: underline; }
         .tags-column-content span { margin-right: 5px; margin-bottom: 3px; display: inline-block;}
         .tag-priority { background-color: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 500;}
-
         .list-item-badge { padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; flex-shrink: 0; white-space: nowrap; display:inline-block; }
         .badge-gray { background-color: #e5e7eb; color: #4b5563; }
         .badge-green { background-color: #dcfce7; color: #166534; }
@@ -137,7 +85,6 @@
         .badge-purple { background-color: #f3e8ff; color: #581c87; } 
         .badge-teal { background-color: #ccfbf1; color: #0f766e; } 
         .badge-pink { background-color: #fce7f3; color: #9d174d; } 
-
         #quick-links-wrapper { max-height: 300px; overflow-y: auto; padding-right: 5px; }
         .quick-link { display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease, border-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; text-decoration: none; }
         .quick-link:last-child { margin-bottom: 0; }
@@ -147,7 +94,6 @@
         .quick-link .link-text { flex-grow: 1; margin: 0 8px; }
         .quick-link .fa-external-link-alt { color: #9ca3af; font-size: 0.8em; }
         .quick-link:hover .fa-external-link-alt { color: #6b7280; }
-
         #communications-list-wrapper { max-height: 280px; overflow-y: auto; padding-right: 5px; }
         .communication-item { padding: 10px 12px; border-radius: 8px; transition: background-color 0.2s ease; color: #374151; border: 1px solid #e5e7eb; margin-bottom: 8px; background-color: #f9fafb; }
         .communication-item:hover { background-color: #eff6ff; }
@@ -157,40 +103,21 @@
         .communication-message-text a:hover { text-decoration: underline; }
         .communication-message-text .fa-external-link-alt { color: #9ca3af; font-size: 0.8em; margin-left: 8px; }
         .communication-message-text a:hover .fa-external-link-alt { color: #6b7280; }
-
-
         .sprint-countdown-text { font-size: 1.5rem; font-weight: 700; color: #1f2937; line-height: 1.2; }
         .sprint-countdown-label { font-size: 0.875rem; color: #4b5563; }
         .sprint-info-card .card-header h3 { color: #1f2937; }
-        
         .mood-emojis { display: flex; justify-content: space-around; align-items: center; padding: 10px 0; }
         .mood-emoji { font-size: 2rem; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.2s ease, background-color 0.2s ease; border: 2px solid transparent; color: #1f2937; }
         .mood-emoji:hover { transform: scale(1.15); }
         .mood-emoji.selected { transform: scale(1.2); border-color: #60a5fa; }
         #mood-save-feedback { font-size: 0.8rem; color: #10b981; text-align: center; margin-top: 5px; height: 1em; }
-        
         #impediments-section label { color: #374151; }
         #impediments-section input[type="text"], 
         #impediments-section textarea,
-        #impediments-section select {
-            width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; 
-            font-size: 0.875rem; color: #1f2937; background-color: #f9fafb;
-            margin-bottom: 0.75rem;
-        }
-        #impediments-section select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            -webkit-appearance: none; -moz-appearance: none; appearance: none;
-            padding-right: 2.5rem; 
-        }
+        #impediments-section select { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 0.875rem; color: #1f2937; background-color: #f9fafb; margin-bottom: 0.75rem; }
+        #impediments-section select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2.5rem; }
         #impediments-section textarea { min-height: 80px; resize: vertical; }
-        #impediments-section button { 
-            padding: 10px 15px; background-color: #ef4444; color: white; border: none; 
-            border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; 
-            transition: background-color 0.2s ease; width: 100%; display: flex; align-items: center; justify-content: center;
-        }
+        #impediments-section button { padding: 10px 15px; background-color: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background-color 0.2s ease; width: 100%; display: flex; align-items: center; justify-content: center; }
         #impediments-section button:hover { background-color: #dc2626; }
         #impediments-section button i { margin-right: 8px; }
         #impediments-list-container { max-height: 250px; overflow-y: auto; padding: 0; }
@@ -199,12 +126,10 @@
         .impediment-title { font-weight: 600; color: #1f2937; margin-bottom: 4px; }
         .impediment-description { font-size: 0.85rem; color: #4b5563; margin-bottom: 6px; white-space: pre-wrap; }
         .impediment-meta { font-size: 0.75rem; color: #6b7280; display: flex; justify-content: space-between; }
-
         .event-item { padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
         .event-item:last-child { border-bottom: none; }
         .event-title { font-weight: 500; color: #1f2937; }
         .event-dates { font-size: 0.8rem; color: #4b5563; }
-
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 1.2rem; z-index: 9999; text-align: center; padding: 20px; }
         #loading-overlay .spinner { font-size: 2.5rem; margin-bottom: 15px; }
         #loading-overlay p { word-break: break-word; }
@@ -213,12 +138,11 @@
         .help-chat-bubble { position: fixed; bottom: 20px; right: 20px; background-color: #2563eb; color: white; padding: 10px 15px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; transition: background-color 0.2s ease, transform 0.2s ease; z-index: 1000; text-decoration: none; }
         .help-chat-bubble:hover { background-color: #1d4ed8; transform: scale(1.05); }
         .help-chat-bubble i { margin-right: 8px; font-size: 1.2rem; }
-        
         .podium-item .progress-bar-container { margin-top: 2px; height: 10px; background-color: #e5e7eb; border-radius: 9999px; overflow:hidden; } 
         .podium-item .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.3s ease-in-out;}
         .podium-responsible-name { font-weight: 500; color: #374151; }
-        .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: auto; /* Alinea el porcentaje a la derecha */ }
-        .podium-item-counts { font-size: 0.75rem; color: #4b5563; margin-left: 6px; } /* Estilo para los conteos */
+        .podium-progress-percentage { font-size: 0.8rem; color: #6b7280; margin-left: auto; }
+        .podium-item-counts { font-size: 0.75rem; color: #4b5563; margin-left: 6px; }
         .scrollable-list-container { max-height: 220px; overflow-y: auto; padding-right: 5px; } 
     </style>
 </head>
@@ -309,6 +233,32 @@
         <button id="clear-filters-btn"><i class="fas fa-eraser"></i> Limpiar Filtros</button>
     </div>
 
+    <div class="w-full mb-6">
+        <section class="card p-0">
+            <div class="card-header">
+                <h2><i class="fas fa-list-check mr-2 text-orange-500"></i>Historias de Usuario Pendientes</h2>
+                <span class="counter ml-auto" id="pending-user-stories-counter">Total: 0</span>
+            </div>
+            <div class="data-table-container pending-stories-scrollable-container"> 
+                <table class="data-table"> 
+                    <thead>
+                        <tr>
+                            <th style="width: 14.28%;">Nombre</th>
+                            <th style="width: 14.28%;">Seguimiento</th>
+                            <th style="width: 14.28%;">ID Feature</th>
+                            <th style="width: 14.28%;">ID Historia</th>
+                            <th style="width: 14.28%;">Sprint</th>
+                            <th style="width: 14.28%;">Estatus</th>
+                            <th style="width: 14.28%;">Prioridad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-user-stories-tbody">
+                    </tbody>
+                </table>
+                <p id="no-pending-user-stories-message" class="text-sm text-gray-600 italic p-4 text-center" style="display:none;">No hay historias pendientes que coincidan con los filtros.</p>
+            </div>
+        </section>
+    </div>
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <section class="card p-0"> 
@@ -328,11 +278,11 @@
                         <span id="features-progress-percentage" class="general-progress-text">0%</span>
                     </div>
                     <div class="general-progress-bar-bg">
-                        <div id="features-progress-bar" class="general-progress-bar-fill" style="width: 0%;"></div>
+                        <div id="features-progress-bar" class="general-progress-bar-fill bg-gray-300" style="width: 0%;"></div>
                     </div>
                 </div>
-                <div id="features-table-main-container" class="features-table-container"> 
-                    <table class="features-table">
+                <div id="features-table-main-container" class="data-table-container features-table-container"> 
+                    <table class="data-table features-table">
                         <thead>
                             <tr>
                                 <th class="col-uniform">Nombre</th>
@@ -343,7 +293,7 @@
                             </tr>
                         </thead>
                         <tbody id="features-list-tbody">
-                            </tbody>
+                        </tbody>
                     </table>
                     <p id="no-features-message" class="text-sm text-gray-600 italic p-4 text-center" style="display:none;">No hay features que coincidan con los filtros.</p>
                 </div>
@@ -384,7 +334,7 @@
                 </div>
                 <div id="communications-list-wrapper" class="p-4">
                     <div id="communications-list-container" class="space-y-2">
-                        </div>
+                    </div>
                     <p id="no-communications-message" class="text-sm text-gray-600 italic mt-2" style="display:none;">No hay comunicados.</p>
                 </div>
             </section>
@@ -417,7 +367,7 @@
                 </div>
                 <div id="quick-links-wrapper" class="p-4"> 
                     <div id="quick-links-container" class="space-y-2">
-                        </div>
+                    </div>
                     <p class="text-sm text-gray-500 mt-2" id="no-quick-links-message" style="display:none;">No hay enlaces útiles configurados.</p>
                 </div>
             </section>
@@ -431,13 +381,13 @@
                         <label for="impediment-feature-filter" class="block text-sm font-medium text-gray-700 mb-1">Feature Relacionada:</label>
                         <select id="impediment-feature-filter" required>
                             <option value="">Seleccionar Feature...</option>
-                            </select>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="impediment-us-filter" class="block text-sm font-medium text-gray-700 mb-1">Historia de Usuario:</label>
                         <select id="impediment-us-filter" required disabled> 
                             <option value="">Seleccionar HU relacionada...</option>
-                            </select>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="impediment-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción Detallada:</label>
@@ -447,7 +397,7 @@
                 </div>
                 <div class="border-t mt-2">
                     <div class="card-header">
-                            <h3><i class="fas fa-list-alt mr-2 text-gray-600"></i>Impedimentos Recientes</h3>
+                        <h3><i class="fas fa-list-alt mr-2 text-gray-600"></i>Impedimentos Recientes</h3>
                     </div>
                     <div id="impediments-list-container" class="p-0"> 
                         <p id="no-impediments-message" class="text-sm text-gray-500 italic p-4" style="display:none;">No hay impedimentos registrados.</p>
@@ -471,7 +421,7 @@
         let masterQuickLinksData = []; 
         let masterImpedimentsData = []; 
         let allFeaturesForImpediments = []; 
-        let nonDeployedUserStoriesForImpediments = []; 
+        let masterPendingUserStoriesData = []; 
         let upcomingEventsData = []; 
         let appConfig = {}; 
         let masterPodiumDataFeatures = [];
@@ -480,8 +430,6 @@
         let availableQs = [];
         let availableSprints = [];
         let masterCommunicationsData = []; 
-
-
         const DEFAULT_TEAM_MOOD_EMOJI = "😊"; 
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingMessage = document.getElementById('loading-message');
@@ -530,10 +478,11 @@
             const selectedStatus = document.getElementById('global-status-filter').value;
             const selectedQ = document.getElementById('global-q-filter').value;
             const selectedSprint = document.getElementById('global-sprint-filter').value;
-            const selectedActivity = document.getElementById('global-activity-filter').value; // Nuevo filtro
+            const selectedActivity = document.getElementById('global-activity-filter').value; 
             const featureSearchTerm = document.getElementById('features-search-input').value;
             
             renderFeatures(selectedResponsible, selectedStatus, selectedQ, selectedSprint, selectedActivity, featureSearchTerm);
+            renderPendingUserStories(selectedResponsible, selectedStatus, selectedQ, selectedSprint, selectedActivity, featureSearchTerm);
             renderPodium(masterPodiumDataFeatures, 'podium-features-container', 'no-podium-features-data-message', selectedResponsible);
             renderPodium(masterPodiumDataUserStories, 'podium-us-container', 'no-podium-us-data-message', selectedResponsible);
             renderPodium(masterPodiumDataDependencies, 'podium-dependencies-container', 'no-podium-dependencies-data-message', selectedResponsible);
@@ -566,7 +515,6 @@
             }
         }
 
-
         function toggleFeatureDetails(featureRowId, iconElement) {
             const detailsRow = document.getElementById(`details-${featureRowId}`);
             if (detailsRow) {
@@ -578,23 +526,18 @@
             }
         }
         
-        function customSortItems(a, b) {
+        function customSortItems(a, b) { 
             const statusA = String(a.Status || '').toLowerCase();
             const statusB = String(b.Status || '').toLowerCase();
             const nameA = String(a.Name || '').toLowerCase();
             const nameB = String(b.Name || '').toLowerCase();
-
             const statusOrder = { 'new': 1, 'in progress': 2, 'qa': 3, 'blocked': 4, 'deployed': 5, 'discarded': 6 };
             const orderA = statusOrder[statusA] || 7;
             const orderB = statusOrder[statusB] || 7;
-
-            if (orderA !== orderB) {
-                return orderA - orderB;
-            }
+            if (orderA !== orderB) return orderA - orderB;
             return nameA.localeCompare(nameB);
         }
         
-        // Modificada para incluir filterActivity
         function renderFeatures(filterResponsible, filterStatus, filterQ, filterSprint, filterActivity, searchTerm = '') {
             const tbody = document.getElementById('features-list-tbody');
             const counterElement = document.getElementById('features-counter');
@@ -604,41 +547,30 @@
             const lowerSearchTerm = searchTerm.toLowerCase();
 
             let filteredData = masterFeaturesData.filter(feature => {
-                // Función auxiliar para verificar si un item (feature, US, Dep) cumple con los filtros básicos (no actividad)
                 const itemMatchesBaseFilters = (item, itemResponsible, itemStatus, itemQ, itemSprint) => {
                     if (filterResponsible !== 'all' && itemResponsible !== filterResponsible) return false;
                     if (filterStatus !== 'all' && String(itemStatus || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
-                    if (filterQ !== 'all' && String(itemQ || '') !== filterQ) return false; // Para Q en Feature
-                    if (itemSprint && filterSprint !== 'all' && String(itemSprint || '') !== filterSprint) return false; // Para Sprint en US/Dep
+                    if (filterQ !== 'all' && String(itemQ || '') !== filterQ) return false; 
+                    if (itemSprint && filterSprint !== 'all' && String(itemSprint || '') !== filterSprint) return false; 
                     return true;
                 };
-                
-                // Función auxiliar para la búsqueda por término
                 const searchInItem = (item) => {
-                    if (!searchTerm) return true; // Si no hay término de búsqueda, el item pasa este filtro
+                    if (!searchTerm) return true; 
                     const searchInText = (text) => text && String(text).toLowerCase().includes(lowerSearchTerm);
                     return searchInText(item.Name) || searchInText(item.Responsible) || searchInText(item.ID) ||
                            searchInText(item.Q) || searchInText(item.Priority) || searchInText(item.Status) ||
-                           searchInText(item.Sprint); // Añadir Sprint a la búsqueda general
+                           searchInText(item.Sprint); 
                 };
-
-                // Aplicar filtros básicos a la Feature
                 if (!itemMatchesBaseFilters(feature, feature.Responsible, feature.Status, feature.Q, null)) {
-                     // Si la feature misma no cumple Q o su propio Estatus/Responsable (cuando filtro de actividad es 'feature' o 'all')
                     if (filterActivity === 'all' || filterActivity === 'feature') {
-                         if (filterQ !== 'all' && String(feature.Q) !== filterQ) return false;
-                         if (filterResponsible !== 'all' && feature.Responsible !== filterResponsible) return false;
-                         if (filterStatus !== 'all' && String(feature.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
-                    } else { // Si filtramos por HU o Dep, la feature puede pasar si un hijo cumple
-                        // No retornar false aquí todavía, se evaluará en los hijos
+                        if (filterQ !== 'all' && String(feature.Q) !== filterQ) return false;
+                        if (filterResponsible !== 'all' && feature.Responsible !== filterResponsible) return false;
+                        if (filterStatus !== 'all' && String(feature.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
                     }
                 }
-
-
-                // Filtro de Actividad
                 let activityMatch = false;
                 if (filterActivity === 'all') {
-                    activityMatch = true; // Si es 'all', la feature pasa si cumple filtros base y búsqueda
+                    activityMatch = true; 
                 } else if (filterActivity === 'feature') {
                     activityMatch = itemMatchesBaseFilters(feature, feature.Responsible, feature.Status, feature.Q, null) && searchInItem(feature);
                 } else if (filterActivity === 'userstory') {
@@ -650,25 +582,19 @@
                         activityMatch = true;
                     }
                 }
-                
                 if (!activityMatch) return false;
-
-                // Búsqueda global (si no se hizo ya dentro del filtro de actividad específico)
-                // Si el filtro de actividad es 'all', necesitamos asegurar que la feature o alguno de sus hijos coincida con la búsqueda
                 if (filterActivity === 'all' && searchTerm) {
                     if (searchInItem(feature)) return true;
                     if (feature.userStories?.some(us => searchInItem(us))) return true;
                     if (feature.dependencies?.some(dep => searchInItem(dep))) return true;
-                    return false; // Si es 'all' y hay término de búsqueda, y nada coincide, se descarta.
+                    return false; 
                 }
-                
-                // Considerar el caso donde el filtro de responsable/estatus/sprint debe aplicar al hijo si la actividad es HU/Dep
                 if (filterActivity === 'userstory') {
                     return feature.userStories?.some(us => 
                         (filterResponsible === 'all' || us.Responsible === filterResponsible) &&
                         (filterStatus === 'all' || String(us.Status || '').trim().toLowerCase() === filterStatus.toLowerCase()) &&
                         (filterSprint === 'all' || String(us.Sprint || '') === filterSprint) &&
-                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && // Q de la feature padre
+                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && 
                         searchInItem(us)
                     );
                 }
@@ -677,13 +603,11 @@
                         (filterResponsible === 'all' || dep.Responsible === filterResponsible) &&
                         (filterStatus === 'all' || String(dep.Status || '').trim().toLowerCase() === filterStatus.toLowerCase()) &&
                         (filterSprint === 'all' || String(dep.Sprint || '') === filterSprint) &&
-                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && // Q de la feature padre
+                        (filterQ === 'all' || String(feature.Q || '') === filterQ) && 
                         searchInItem(dep)
                     );
                 }
-
-
-                return true; // Si pasó todos los filtros
+                return true; 
             });
             
             filteredData.sort(customSortItems);
@@ -700,20 +624,16 @@
 
             filteredData.forEach((feature, index) => {
                 const featureRowId = `feature-row-${(feature.ID || index).toString().replace(/[^a-zA-Z0-9-_]/g, '')}`;
-                
                 const featureNameDisplay = feature.Name || 'Feature sin nombre';
                 const featureIdDisplay = feature.URL ? 
                     `<a href="${feature.URL}" target="_blank" class="text-blue-600 hover:underline">${feature.ID || 'N/A'}</a>` :
                     (feature.ID || 'N/A');
-
                 const tagsHtml = `
                     <div class="tags-column-content">
                         <span class="list-item-badge ${getStatusBadge(feature.Status)}">${feature.Status || 'N/A'}</span>
                         ${feature.Q ? `<span class="list-item-badge badge-purple">Q: ${feature.Q}</span>` : ''}
                         ${feature.Priority ? `<span class="tag-priority">P: ${feature.Priority}</span>` : ''}
-                    </div>
-                `;
-
+                    </div>`;
                 const featureRow = document.createElement('tr');
                 featureRow.className = `feature-row ${index % 2 === 0 ? 'even' : ''}`;
                 featureRow.innerHTML = `
@@ -721,50 +641,42 @@
                     <td class="col-uniform">${feature.Responsible || 'N/A'}</td>
                     <td class="col-uniform">${featureIdDisplay}</td>
                     <td class="col-uniform">${tagsHtml}</td>
-                    <td class="col-expand"><i class="fas fa-chevron-right feature-expand-icon" onclick="toggleFeatureDetails('${featureRowId}', this)"></i></td>
-                `;
+                    <td class="col-expand"><i class="fas fa-chevron-right feature-expand-icon" onclick="toggleFeatureDetails('${featureRowId}', this)"></i></td>`;
                 tbody.appendChild(featureRow);
-
                 const detailsRow = document.createElement('tr');
                 detailsRow.id = `details-${featureRowId}`;
                 detailsRow.style.display = 'none'; 
                 const detailsCell = document.createElement('td');
                 detailsCell.colSpan = 5; 
                 detailsCell.className = 'feature-details-row';
-                
-                // Filtrar HUs y Dependencias también según los filtros globales si el filtro de actividad no es específico para ellos
                 const filterItem = (item, itemType) => {
-                    if (filterActivity !== 'all' && filterActivity !== itemType && filterActivity !== 'feature') return false; // Si filtramos por feature, mostramos todos sus hijos que cumplan
+                    if (filterActivity !== 'all' && filterActivity !== itemType && filterActivity !== 'feature') return false; 
                     if (filterResponsible !== 'all' && item.Responsible !== filterResponsible) return false;
                     if (filterStatus !== 'all' && String(item.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
                     if (filterSprint !== 'all' && String(item.Sprint || '') !== filterSprint) return false;
-                    if (filterQ !== 'all' && String(feature.Q || '') !== filterQ) return false; // Q de la feature padre
+                    if (filterQ !== 'all' && String(feature.Q || '') !== filterQ) return false; 
                     if (searchTerm && ! (String(item.Name || '').toLowerCase().includes(lowerSearchTerm) || String(item.ID || '').toLowerCase().includes(lowerSearchTerm) )) return false;
                     return true;
                 };
-
                 let userStoriesToDisplay = feature.userStories || [];
                 if (filterActivity === 'all' || filterActivity === 'feature' || filterActivity === 'userstory') {
                      userStoriesToDisplay = (feature.userStories || []).filter(us => filterItem(us, 'userstory'));
-                } else { // Si el filtro de actividad es 'dependency', no mostramos HUs a menos que cumplan otros filtros
-                    userStoriesToDisplay = [];
+                } else { 
+                     userStoriesToDisplay = [];
                 }
-
-
                 let userStoriesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Historias de Usuario que coincidan.</td></tr>`;
                 if (userStoriesToDisplay.length > 0) {
                     userStoriesHtml = userStoriesToDisplay.map(us => {
                         const usNameDisplay = us.Name || 'HU sin nombre';
                         const usIdDisplay = us.JiraLink ? 
-                            `<a href="${us.JiraLink}" target="_blank" class="text-blue-600 hover:underline">${us.ID || 'N/A'}</a>` :
+                            `<a href="${us.JiraLink}" target="_blank">${us.ID || 'N/A'}</a>` :
                             (us.ID || 'N/A');
                         const usTagsHtml = `
                             <div class="tags-column-content">
                                 <span class="list-item-badge ${getStatusBadge(us.Status)}">${us.Status || 'N/A'}</span>
                                 ${us.Sprint ? `<span class="list-item-badge badge-teal">S: ${us.Sprint}</span>` : ''}
                                 ${us.Priority ? `<span class="tag-priority">P: ${us.Priority}</span>` : ''}
-                            </div>
-                        `;
+                            </div>`;
                         return `
                         <tr>
                             <td class="col-uniform">${usNameDisplay}</td>
@@ -774,29 +686,25 @@
                         </tr>`;
                     }).join('');
                 }
-
                 let dependenciesToDisplay = feature.dependencies || [];
                  if (filterActivity === 'all' || filterActivity === 'feature' || filterActivity === 'dependency') {
                     dependenciesToDisplay = (feature.dependencies || []).filter(dep => filterItem(dep, 'dependency'));
-                } else { // Si el filtro de actividad es 'userstory', no mostramos Deps a menos que cumplan otros filtros
+                } else { 
                     dependenciesToDisplay = [];
                 }
-
-
                 let dependenciesHtml = `<tr><td colspan="4" class="text-center italic py-2">No hay Dependencias que coincidan.</td></tr>`;
                 if (dependenciesToDisplay.length > 0) {
                     dependenciesHtml = dependenciesToDisplay.map(dep => {
                         const depNameDisplay = dep.Name || 'Dependencia s.n.';
                         const depIdDisplay = dep.URL ? 
-                            `<a href="${dep.URL}" target="_blank" class="text-blue-600 hover:underline">${dep.ID || 'N/A'}</a>` :
+                            `<a href="${dep.URL}" target="_blank">${dep.ID || 'N/A'}</a>` :
                             (dep.ID || 'N/A');
                         const depTagsHtml = `
                             <div class="tags-column-content">
                                 <span class="list-item-badge ${getStatusBadge(dep.Status)}">${dep.Status || 'N/A'}</span>
                                 ${dep.Sprint ? `<span class="list-item-badge badge-pink">S: ${dep.Sprint}</span>` : ''}
                                 ${dep.Priority ? `<span class="tag-priority">P: ${dep.Priority}</span>` : ''}
-                            </div>
-                        `;
+                            </div>`;
                         return `
                         <tr>
                             <td class="col-uniform">${depNameDisplay}</td>
@@ -806,7 +714,6 @@
                         </tr>`;
                     }).join('');
                 }
-
                 detailsCell.innerHTML = `
                     <div class="feature-details-content">
                         <h4><i class="fas fa-tasks mr-2 text-blue-500"></i>Historias de Usuario (${userStoriesToDisplay.length || 0})</h4>
@@ -819,28 +726,89 @@
                             <thead><tr><th class="col-uniform">Nombre</th><th class="col-uniform">Seguimiento</th><th class="col-uniform">ID</th><th class="col-uniform">Etiquetas</th></tr></thead>
                             <tbody>${dependenciesHtml}</tbody>
                         </table>
-                    </div>
-                `;
+                    </div>`;
                 detailsRow.appendChild(detailsCell);
                 tbody.appendChild(detailsRow);
             });
-            
             const deployedCount = filteredData.filter(f => String(f.Status).trim().toLowerCase() === 'deployed').length;
             counterElement.textContent = `Desplegadas: ${deployedCount} de ${filteredData.length}`;
         }
 
+        function renderPendingUserStories(filterResponsible, filterStatus, filterQ, filterSprint, filterActivity, searchTerm = '') {
+            const tbody = document.getElementById('pending-user-stories-tbody');
+            const counterElement = document.getElementById('pending-user-stories-counter');
+            const noStoriesMessage = document.getElementById('no-pending-user-stories-message');
+
+            if (!tbody || !counterElement || !noStoriesMessage) return;
+            const lowerSearchTerm = searchTerm.toLowerCase();
+
+            if (filterActivity === 'feature' || filterActivity === 'dependency') {
+                tbody.innerHTML = '';
+                noStoriesMessage.textContent = 'Filtro de actividad no aplica a Historias Pendientes.';
+                noStoriesMessage.style.display = 'block';
+                counterElement.textContent = `Total: 0`;
+                return;
+            }
+
+            let filteredStories = masterPendingUserStoriesData.filter(us => {
+                if (filterResponsible !== 'all' && us.Responsible !== filterResponsible) return false;
+                if (filterStatus !== 'all' && String(us.Status || '').trim().toLowerCase() !== filterStatus.toLowerCase()) return false;
+                if (filterQ !== 'all' && String(us.Q || '') !== filterQ) return false;
+                if (filterSprint !== 'all' && String(us.Sprint || '') !== filterSprint) return false;
+                if (searchTerm) {
+                    const searchInText = (text) => text && String(text).toLowerCase().includes(lowerSearchTerm);
+                    if (!(searchInText(us.Name) || searchInText(us.ID) || searchInText(us.Responsible) || searchInText(us.Sprint) || searchInText(us.Status) || searchInText(us.Priority) || searchInText(us.FeatureID) )) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            tbody.innerHTML = '';
+            if (filteredStories.length === 0) {
+                noStoriesMessage.textContent = searchTerm || filterResponsible !== 'all' || filterStatus !== 'all' || filterQ !== 'all' || filterSprint !== 'all' ? 
+                                            'Ninguna historia pendiente coincide con los filtros/búsqueda.' : 
+                                            'No hay historias de usuario pendientes.';
+                noStoriesMessage.style.display = 'block';
+                counterElement.textContent = `Total: 0`;
+                return;
+            }
+            noStoriesMessage.style.display = 'none';
+            counterElement.textContent = `Total: ${filteredStories.length}`;
+
+            filteredStories.forEach(us => {
+                const row = tbody.insertRow();
+                row.className = `data-row hover:bg-gray-100`; 
+
+                const nameCell = row.insertCell();
+                nameCell.textContent = us.Name || 'HU sin nombre';
+
+                const responsibleCell = row.insertCell();
+                responsibleCell.textContent = us.Responsible || 'N/A';
+
+                const featureIdCell = row.insertCell(); // ID Feature primero
+                featureIdCell.innerHTML = us.FeatureURL ? `<a href="${us.FeatureURL}" target="_blank" class="text-blue-600 hover:underline">${us.FeatureID || 'N/A'}</a>` : (us.FeatureID || 'N/A');
+                
+                const idCell = row.insertCell(); // ID Historia después
+                idCell.innerHTML = us.JiraLink ? `<a href="${us.JiraLink}" target="_blank" class="text-blue-600 hover:underline">${us.ID || 'N/A'}</a>` : (us.ID || 'N/A');
+
+                const sprintCell = row.insertCell();
+                sprintCell.textContent = us.Sprint || 'N/A';
+
+                const statusCell = row.insertCell();
+                statusCell.innerHTML = `<span class="list-item-badge ${getStatusBadge(us.Status)}">${us.Status || 'N/A'}</span>`;
+                
+                const priorityCell = row.insertCell();
+                priorityCell.innerHTML = us.Priority ? `<span class="tag-priority">P: ${us.Priority}</span>` : 'N/A';
+            });
+        }
 
         function renderQuickLinks() {
             const container = document.getElementById('quick-links-container');
             const noLinksMessage = document.getElementById('no-quick-links-message');
             const searchInput = document.getElementById('quick-links-search');
             const cardHeader = document.querySelector('#quick-links-card .card-header'); 
-
-            if (!searchInput || !container || !noLinksMessage || !cardHeader) {
-                console.error("Elementos del DOM para Enlaces Útiles no encontrados.");
-                return; 
-            }
-            
+            if (!searchInput || !container || !noLinksMessage || !cardHeader) return;
             if (appConfig.QUICKLINKS_EDIT_URL && appConfig.QUICKLINKS_EDIT_URL !== '#') {
                 let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
                 if (!editIconLink) {
@@ -855,23 +823,16 @@
                     editIconLink.href = appConfig.QUICKLINKS_EDIT_URL; 
                 }
             }
-
-
             const searchTerm = searchInput.value.toLowerCase().trim();
             let filteredLinks = masterQuickLinksData;
-
             if (searchTerm) {
-                if (!Array.isArray(masterQuickLinksData)) { 
-                    console.error("Error: masterQuickLinksData is not an array in renderQuickLinks.");
-                    masterQuickLinksData = []; 
-                }
+                if (!Array.isArray(masterQuickLinksData)) masterQuickLinksData = []; 
                 filteredLinks = masterQuickLinksData.filter(link => {
                     const linkText = String(link.Text || '').toLowerCase();
                     const linkUrl = String(link.URL || '').toLowerCase();
                     return linkText.includes(searchTerm) || linkUrl.includes(searchTerm);
                 });
             }
-            
             if (Array.isArray(filteredLinks)) { 
                 filteredLinks.sort((a, b) => {
                     if (a.Favorite === true && b.Favorite !== true) return -1;
@@ -880,21 +841,17 @@
                            (String(a.Text || "")).localeCompare(String(b.Text || ""));
                 });
             } else {
-                console.error("Error: filteredLinks is not an array before sorting.");
                 filteredLinks = []; 
             }
-
             container.innerHTML = ''; 
             if (!filteredLinks || filteredLinks.length === 0) {
                 noLinksMessage.style.display = 'block';
                 noLinksMessage.textContent = searchTerm ? 'No hay enlaces que coincidan con la búsqueda.' : 'No hay enlaces útiles configurados.';
                 return;
             }
-            
             noLinksMessage.style.display = 'none'; 
             filteredLinks.forEach(link => {
-                if (typeof link.Text !== 'undefined' && link.Text !== null && 
-                    typeof link.URL !== 'undefined' && link.URL !== null) { 
+                if (typeof link.Text !== 'undefined' && link.Text !== null && typeof link.URL !== 'undefined' && link.URL !== null) { 
                     const favoriteIcon = link.Favorite === true ? '<i class="fas fa-star mr-2"></i>' : '<i class="far fa-star mr-2"></i>';
                     const linkElement = document.createElement('a');
                     linkElement.href = String(link.URL); 
@@ -910,12 +867,10 @@
             const podiumContainer = document.getElementById(containerId);
             const noDataMsgElement = document.getElementById(noDataMessageId);
             if (!podiumContainer || !noDataMsgElement) return;
-
             let displayData = podiumData;
             if (filterResponsible !== 'all') {
                 displayData = podiumData.filter(p => p.responsible === filterResponsible);
             }
-            
             podiumContainer.innerHTML = ''; 
             if (!displayData || displayData.length === 0) {
                 noDataMsgElement.style.display = 'block';
@@ -923,77 +878,64 @@
                 return;
             }
             noDataMsgElement.style.display = 'none';
-
             displayData.forEach(item => {
                 const podiumItemDiv = document.createElement('div'); 
                 podiumItemDiv.className = 'podium-item mb-3';
-                
                 const nameAndDetailsDiv = document.createElement('div'); 
                 nameAndDetailsDiv.className = 'flex justify-between items-center mb-1';
-                
                 const responsibleNameSpan = document.createElement('span'); 
                 responsibleNameSpan.className = 'podium-responsible-name text-sm'; 
                 responsibleNameSpan.textContent = item.responsible;
-
-                // Contenedor para conteos y porcentaje para alineación
                 const statsContainer = document.createElement('div');
                 statsContainer.className = 'flex items-center';
-
                 const countsSpan = document.createElement('span');
                 countsSpan.className = 'podium-item-counts';
                 countsSpan.textContent = `(${item.deployedItems}/${item.totalItems})`;
-                
                 const progressPercentageSpan = document.createElement('span'); 
                 progressPercentageSpan.className = 'podium-progress-percentage text-sm'; 
                 progressPercentageSpan.textContent = `${item.progress}%`;
-
                 statsContainer.appendChild(countsSpan);
                 statsContainer.appendChild(progressPercentageSpan);
-
                 nameAndDetailsDiv.appendChild(responsibleNameSpan); 
                 nameAndDetailsDiv.appendChild(statsContainer);
-                
                 const progressContainerDiv = document.createElement('div'); 
                 progressContainerDiv.className = 'podium-item progress-bar-container';
                 const progressBarDiv = document.createElement('div'); 
                 progressBarDiv.className = `progress-bar ${getProgressBarColorGeneral(item.progress)}`; 
                 progressBarDiv.style.width = `${item.progress}%`;
                 progressContainerDiv.appendChild(progressBarDiv);
-                
                 podiumItemDiv.appendChild(nameAndDetailsDiv); 
                 podiumItemDiv.appendChild(progressContainerDiv);
                 podiumContainer.appendChild(podiumItemDiv);
             });
         }
 
-
         function populateFilters() { 
             const responsibleFilter = document.getElementById('global-responsible-filter');
             const statusFilter = document.getElementById('global-status-filter');
             const qFilter = document.getElementById('global-q-filter');
             const sprintFilter = document.getElementById('global-sprint-filter');
-            // El filtro de Actividad tiene opciones estáticas, no se llena aquí
-
             if (!responsibleFilter || !statusFilter || !qFilter || !sprintFilter) return;
-            
             const clearOptions = (selectElement) => {
-                // No limpiar la primera opción "Todos" o la opción por defecto
                 while (selectElement.options.length > 1) selectElement.remove(1);
             };
             clearOptions(responsibleFilter);
             clearOptions(statusFilter);
             clearOptions(qFilter);
             clearOptions(sprintFilter);
-
-            let allItemsForFilters = [...masterFeaturesData];
-            masterFeaturesData.forEach(f => {
-                if (f.userStories) allItemsForFilters = allItemsForFilters.concat(f.userStories);
+            let allItemsForFilters = [...masterFeaturesData, ...masterPendingUserStoriesData]; 
+            masterFeaturesData.forEach(f => { 
+                if (f.userStories) {
+                    f.userStories.forEach(us => {
+                        if (!masterPendingUserStoriesData.find(pus => pus.ID === us.ID && pus.FeatureID === us.FeatureID)) {
+                            allItemsForFilters.push(us);
+                        }
+                    });
+                }
                 if (f.dependencies) allItemsForFilters = allItemsForFilters.concat(f.dependencies);
             });
-
             const allResponsibles = [...new Set(allItemsForFilters.map(item => item.Responsible))].filter(Boolean).sort();
             allResponsibles.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; responsibleFilter.appendChild(o); });
-            
             const desiredStatusOrder = ["New", "In Progress", "QA", "Deployed", "Blocked", "Discarded"]; 
             const uniqueStatuses = [...new Set(allItemsForFilters.map(item => String(item.Status || '').trim()))].filter(Boolean);
             const sortedStatuses = uniqueStatuses.sort((a, b) => {
@@ -1004,7 +946,6 @@
                 return a.localeCompare(b);
             });
             sortedStatuses.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; statusFilter.appendChild(o); });
-
             (availableQs || []).forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; qFilter.appendChild(o); });
             (availableSprints || []).forEach(sprint => { const o = document.createElement('option'); o.value = sprint; o.textContent = sprint; sprintFilter.appendChild(o); });
         }
@@ -1012,14 +953,13 @@
         function setupFilterListeners() {
             document.getElementById('global-q-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('global-sprint-filter').addEventListener('change', applyFiltersAndRender);
-            document.getElementById('global-activity-filter').addEventListener('change', applyFiltersAndRender); // Nuevo listener
+            document.getElementById('global-activity-filter').addEventListener('change', applyFiltersAndRender); 
             document.getElementById('global-responsible-filter').addEventListener('change', applyFiltersAndRender);
             document.getElementById('global-status-filter').addEventListener('change', applyFiltersAndRender);
-            
             document.getElementById('clear-filters-btn').addEventListener('click', () => {
                 document.getElementById('global-q-filter').value = 'all'; 
                 document.getElementById('global-sprint-filter').value = 'all'; 
-                document.getElementById('global-activity-filter').value = 'all'; // Resetear nuevo filtro
+                document.getElementById('global-activity-filter').value = 'all'; 
                 document.getElementById('global-responsible-filter').value = 'all'; 
                 document.getElementById('global-status-filter').value = 'all'; 
                 document.getElementById('features-search-input').value = ''; 
@@ -1028,21 +968,10 @@
                 renderTeamCommunications(); 
                 renderQuickLinks();
             });
-
             const quickLinksSearchInput = document.getElementById('quick-links-search');
-            if (quickLinksSearchInput) {
-                quickLinksSearchInput.addEventListener('input', renderQuickLinks);
-            } else {
-                console.error("ERROR CRÍTICO: No se pudo encontrar el input 'quick-links-search' para añadir el listener.");
-            }
-            
+            if (quickLinksSearchInput) quickLinksSearchInput.addEventListener('input', renderQuickLinks);
             const communicationsSearchInput = document.getElementById('communications-search-input');
-            if (communicationsSearchInput) {
-                communicationsSearchInput.addEventListener('input', () => renderTeamCommunications(communicationsSearchInput.value));
-            } else {
-                console.error("ERROR CRÍTICO: No se pudo encontrar el input 'communications-search-input' para añadir el listener.");
-            }
-
+            if (communicationsSearchInput) communicationsSearchInput.addEventListener('input', () => renderTeamCommunications(communicationsSearchInput.value));
             document.getElementById('features-search-input').addEventListener('input', applyFiltersAndRender); 
             document.getElementById('impediment-feature-filter').addEventListener('change', populateImpedimentUserStoryFilter); 
         }
@@ -1061,22 +990,18 @@
             const countdownWrapper = document.getElementById('sprint-countdown-wrapper'); 
             const countdownEl = document.getElementById('sprint-countdown-display');
             const countdownLabel = document.getElementById('sprint-countdown-label-text');
-
             if (!sprintIdEl || !countdownWrapper || !countdownEl || !countdownLabel) return;
-
             if (appConfig.SPRINT_INFO_YEAR && appConfig.SPRINT_INFO_QUARTER && appConfig.SPRINT_INFO_NUMBER_IN_QUARTER) {
                 sprintIdEl.textContent = `${appConfig.SPRINT_INFO_YEAR}-${appConfig.SPRINT_INFO_QUARTER}-S${appConfig.SPRINT_INFO_NUMBER_IN_QUARTER}`;
             } else {
                 sprintIdEl.textContent = "No configurado";
             }
-            
             if (!appConfig.SPRINT_END_DATE) { 
                 countdownWrapper.style.display = 'block'; 
                 countdownEl.innerHTML = "Fecha no configurada"; 
                 countdownLabel.style.display = 'none'; 
                 return; 
             }
-
             const sprintEndDateOriginal = new Date(appConfig.SPRINT_END_DATE);
             if (isNaN(sprintEndDateOriginal.getTime())) { 
                 countdownWrapper.style.display = 'block';
@@ -1084,17 +1009,9 @@
                 countdownLabel.style.display = 'none';
                 return; 
             }
-            
-            const sprintEndDate = new Date(
-                sprintEndDateOriginal.getFullYear(),
-                sprintEndDateOriginal.getMonth(),
-                sprintEndDateOriginal.getDate(),
-                23, 59, 59, 999 
-            );
-            
+            const sprintEndDate = new Date(sprintEndDateOriginal.getFullYear(), sprintEndDateOriginal.getMonth(), sprintEndDateOriginal.getDate(), 23, 59, 59, 999);
             const now = new Date();
             const timeLeft = sprintEndDate.getTime() - now.getTime(); 
-            
             if (timeLeft < 0) { 
                 countdownWrapper.style.display = 'block'; 
                 countdownEl.innerHTML = "Sprint Finalizado"; 
@@ -1103,7 +1020,6 @@
             }
             countdownWrapper.style.display = 'block'; 
             countdownLabel.style.display = 'block'; 
-
             const d = Math.floor(timeLeft/(1000*60*60*24)), h = Math.floor((timeLeft%(1000*60*60*24))/(1000*60*60));
             const m = Math.floor((timeLeft%(1000*60*60))/(1000*60)), s = Math.floor((timeLeft%(1000*60))/1000);
             countdownEl.innerHTML = `${d}d ${h}h ${m}m ${s}s`; 
@@ -1113,31 +1029,24 @@
             const container = document.getElementById('announcements-container');
             if (!container || !masterAnnouncementsData) return;
             container.innerHTML = ''; 
-
             let displayList = masterAnnouncementsData.filter(ann => ann.Show === true && ann.Text && String(ann.Text).trim() !== "");
-            
             displayList.sort((a,b) => (Number(a.Order) || Infinity) - (Number(b.Order) || Infinity));
-
             if (displayList.length === 0) { 
                 container.style.display = 'none'; 
                 return; 
             }
             container.style.display = 'block'; 
-
             displayList.forEach(ann => {
                 const bubble = document.createElement('div');
                 bubble.className = `announcement-bubble vibrating`;
-                
                 const contentDiv = document.createElement('div'); 
                 contentDiv.className = 'announcement-content';
                 contentDiv.innerHTML = ann.Link ? `<i class="fas fa-bullhorn mr-2"></i> <a href="${ann.Link}" target="_blank">${ann.Text}</a>` : `<i class="fas fa-bullhorn mr-2"></i> ${ann.Text}`;
-                
                 const closeBtn = document.createElement('button'); 
                 closeBtn.className = 'announcement-close-btn'; 
                 closeBtn.setAttribute('aria-label', 'Cerrar'); 
                 closeBtn.innerHTML = '&times;';
                 closeBtn.onclick = () => bubble.remove(); 
-                
                 bubble.appendChild(contentDiv); 
                 bubble.appendChild(closeBtn);
                 container.appendChild(bubble);
@@ -1165,7 +1074,6 @@
                             }
                         })
                         .withFailureHandler(err => { 
-                            console.error("Fallo saveUserMood:", err);
                             if(feedbackEl) feedbackEl.textContent = 'Error al guardar.';
                         })
                         .saveUserMood(selectedMood);
@@ -1177,16 +1085,13 @@
             const container = document.getElementById('impediments-list-container');
             const noImpedimentsMessage = document.getElementById('no-impediments-message');
             if (!container || !noImpedimentsMessage) return;
-
             container.innerHTML = '';
             if (!masterImpedimentsData || masterImpedimentsData.length === 0) {
                 noImpedimentsMessage.style.display = 'block';
                 return;
             }
             noImpedimentsMessage.style.display = 'none';
-
             const impedimentsToDisplay = masterImpedimentsData.slice(0, 5); 
-
             impedimentsToDisplay.forEach(impediment => {
                 const impedimentElement = document.createElement('div');
                 impedimentElement.className = 'impediment-item'; 
@@ -1198,10 +1103,9 @@
                     associatedItemText += ` (F: ${feature ? feature.Name : impediment.AssociatedFeatureID})`;
                 }
                 if(impediment.AssociatedUserStoryID) {
-                    const us = nonDeployedUserStoriesForImpediments.find(u => String(u.ID) === String(impediment.AssociatedUserStoryID));
+                    const us = masterPendingUserStoriesData.find(u => String(u.ID) === String(impediment.AssociatedUserStoryID));
                     associatedItemText += ` (HU: ${us ? us.Name : impediment.AssociatedUserStoryID})`;
                 }
-
                 impedimentElement.innerHTML = `
                     <div class="impediment-title">${impediment.Title || 'Sin Título'} ${associatedItemText}</div>
                     <div class="impediment-description">${impediment.Description || 'Sin Descripción'}</div>
@@ -1209,8 +1113,7 @@
                         <span><i class="fas fa-user mr-1"></i> ${email}</span>
                         <span><i class="fas fa-tag mr-1"></i> ${impediment.Status || 'N/A'}</span>
                         <span><i class="fas fa-calendar-alt mr-1"></i> ${date}</span>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(impedimentElement);
             });
         }
@@ -1231,15 +1134,12 @@
         function populateImpedimentUserStoryFilter() {
             const featureSelect = document.getElementById('impediment-feature-filter');
             const usSelect = document.getElementById('impediment-us-filter');
-            
             if (!usSelect || !featureSelect ) return;
-
             const selectedFeatureId = featureSelect.value;
             usSelect.innerHTML = '<option value="">Seleccionar HU relacionada...</option>'; 
-            
             if (selectedFeatureId) {
                 usSelect.disabled = false;
-                let storiesToShow = (nonDeployedUserStoriesForImpediments || []).filter(us => String(us.FeatureID) === selectedFeatureId);
+                let storiesToShow = (masterPendingUserStoriesData || []).filter(us => String(us.FeatureID) === selectedFeatureId);
                 storiesToShow.forEach(us => {
                     const option = document.createElement('option');
                     option.value = us.ID; 
@@ -1251,19 +1151,16 @@
             }
         }
         
-
         function setupImpedimentSubmission() { 
             const btn = document.getElementById('submit-impediment-btn');
             const descriptionArea = document.getElementById('impediment-description');
             const featureSelect = document.getElementById('impediment-feature-filter');
             const usSelect = document.getElementById('impediment-us-filter');
-
             if (btn && descriptionArea && usSelect && featureSelect) {
                 btn.addEventListener('click', () => {
                     const description = descriptionArea.value.trim();
                     const selectedFeatureId = featureSelect.value;
                     const selectedUserStoryId = usSelect.value; 
-                    
                     let impedimentTitle = "Impedimento General"; 
                     if (selectedUserStoryId) {
                         const selectedUSOption = usSelect.options[usSelect.selectedIndex];
@@ -1278,24 +1175,12 @@
                             impedimentTitle = textParts.length > 1 ? textParts.slice(1).join(': ') : selectedFeatureOption.textContent;
                         }
                     }
-
-                    if (!selectedFeatureId) {
-                        console.warn("Por favor, selecciona una Feature relacionada.");
-                        featureSelect.focus();
-                        return;
-                    }
-                    if (!description) {
-                        console.warn("Por favor, ingresa una descripción para el impedimento.");
-                        descriptionArea.focus();
-                        return;
-                    }
-
+                    if (!selectedFeatureId) { featureSelect.focus(); return; }
+                    if (!description) { descriptionArea.focus(); return; }
                     btn.disabled = true; 
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...'; 
-                    
                     const impedimentData = { 
-                        title: impedimentTitle, 
-                        description: description,
+                        title: impedimentTitle, description: description,
                         associatedFeatureID: selectedFeatureId || null,
                         associatedUserStoryID: selectedUserStoryId || null 
                     };
@@ -1303,20 +1188,18 @@
                         .withSuccessHandler(res => { 
                             if (res.success) {
                                 descriptionArea.value = '';
+                                featureSelect.value = ""; 
                                 usSelect.value = ""; 
                                 populateImpedimentUserStoryFilter(); 
                                 if (res.impediment) { 
                                     masterImpedimentsData.unshift(res.impediment); 
                                     renderImpediments(); 
                                 }
-                            } else {
-                                console.error("Error al registrar impedimento: " + res.message); 
                             }
                             btn.disabled = false; 
                             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Impedimento';
                         })
                         .withFailureHandler(err => { 
-                            console.error("Fallo al registrar impedimento: " + err.message); 
                             btn.disabled = false; 
                             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Impedimento';
                         })
@@ -1329,9 +1212,7 @@
             const container = document.getElementById('upcoming-events-container');
             const noEventsMessage = document.getElementById('no-upcoming-events-message');
             const cardHeader = document.querySelector('#upcoming-events-card .card-header');
-
             if (!container || !noEventsMessage || !cardHeader) return;
-
             if (appConfig.UPCOMING_EVENTS_EDIT_URL && appConfig.UPCOMING_EVENTS_EDIT_URL !== '#') {
                 let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
                 if (!editIconLink) {
@@ -1346,47 +1227,39 @@
                     editIconLink.href = appConfig.UPCOMING_EVENTS_EDIT_URL; 
                 }
             }
-
             container.innerHTML = ''; 
-
             if (!upcomingEventsData || upcomingEventsData.length === 0) {
                 noEventsMessage.textContent = 'No hay eventos próximos o la hoja de eventos no está configurada.';
                 noEventsMessage.style.display = 'block';
                 return;
             }
             noEventsMessage.style.display = 'none';
-
             upcomingEventsData.forEach(event => {
                 const eventElement = document.createElement('div');
                 eventElement.className = 'event-item';
-                
                 let startDateStr = 'Fecha no disponible';
                 if (event.start) {
                     try {
                         const startDateObj = new Date(event.start);
                         startDateStr = startDateObj.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
-                    } catch (e) { console.error("Error formatting start date: ", e); }
+                    } catch (e) { /* Silently ignore date formatting error */ }
                 }
-
                 let endDateStr = '';
                 if (event.end) { 
                     try {
                         const dStart = new Date(event.start);
                         const dEnd = new Date(event.end);
-                        
                         if (dStart.toDateString() !== dEnd.toDateString() || (event.fullday && dEnd > dStart) ) {
                             const adjustedEndDate = event.fullday ? new Date(dEnd.getTime() - (1000)) : dEnd; 
                             if (adjustedEndDate >= dStart && dStart.toDateString() !== adjustedEndDate.toDateString()) { 
                                 endDateStr = ` - ${adjustedEndDate.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}`;
                             }
                         }
-                    } catch (e) { console.error("Error formatting end date: " + e); }
+                    } catch (e) { /* Silently ignore date formatting error */ }
                 }
-
                 eventElement.innerHTML = `
                     <div class="event-title">${event.title || 'Evento sin título'}</div>
-                    <div class="event-dates">${startDateStr}${endDateStr}</div>
-                `;
+                    <div class="event-dates">${startDateStr}${endDateStr}</div>`;
                 container.appendChild(eventElement);
             });
         }
@@ -1397,19 +1270,12 @@
             const cardTitleElement = document.getElementById('team-message-card-title');
             const searchInput = document.getElementById('communications-search-input'); 
             const cardHeader = document.querySelector('#team-message-card .card-header');
-
-
-            if (!listContainer || !noCommsMessage || !searchInput || !cardHeader) {
-                console.error("Elementos del DOM para comunicados no encontrados.");
-                return;
-            }
-
+            if (!listContainer || !noCommsMessage || !searchInput || !cardHeader) return;
             if (cardTitleElement && appConfig.TEAM_MESSAGE_CARD_TITLE) {
                 cardTitleElement.innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> ${appConfig.TEAM_MESSAGE_CARD_TITLE}`;
             } else if (cardTitleElement) { 
                 cardTitleElement.innerHTML = `<i class="fas fa-bullhorn mr-2 text-indigo-500"></i> Comunicados del Equipo`;
             }
-
             if (appConfig.COMMUNICATIONS_EDIT_URL && appConfig.COMMUNICATIONS_EDIT_URL !== '#') {
                 let editIconLink = cardHeader.querySelector('.edit-link-icon-wrapper');
                 if (!editIconLink) {
@@ -1424,11 +1290,8 @@
                     editIconLink.href = appConfig.COMMUNICATIONS_EDIT_URL;
                 }
             }
-
-            
             const currentSearchTerm = searchInput.value.toLowerCase().trim(); 
             let filteredComms = masterCommunicationsData;
-
             if (currentSearchTerm) {
                 filteredComms = masterCommunicationsData.filter(comm => {
                     const commDate = comm.Date ? new Date(comm.Date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).toLowerCase() : '';
@@ -1437,60 +1300,40 @@
                     return commDate.includes(currentSearchTerm) || commMessage.includes(currentSearchTerm) || commUrl.includes(currentSearchTerm);
                 });
             }
-
             listContainer.innerHTML = ''; 
-
             if (!filteredComms || filteredComms.length === 0) {
                 noCommsMessage.textContent = currentSearchTerm ? 'No hay comunicados que coincidan con la búsqueda.' : 'No hay comunicados recientes.';
                 noCommsMessage.style.display = 'block';
                 return;
             }
-            
             noCommsMessage.style.display = 'none';
-
             filteredComms.forEach(comm => {
                 const commElement = document.createElement('div');
                 commElement.className = 'communication-item';
-
                 let dateHtml = '<p class="communication-date">Fecha no disponible</p>';
                 if (comm.Date) {
                     try {
                         const dateObj = new Date(comm.Date);
-                        const formattedDate = dateObj.toLocaleDateString('es-ES', {
-                            day: '2-digit', month: '2-digit', year: 'numeric' 
-                        });
+                        const formattedDate = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
                         dateHtml = `<p class="communication-date">${formattedDate}</p>`;
-                    } catch (e) {
-                        console.error("Error formateando fecha del comunicado:", comm.Date, e);
-                    }
+                    } catch (e) { /* Silently ignore date formatting error */ }
                 }
-
                 let messageText = comm.Message || "Mensaje no disponible.";
-                let messageContentHtml = '';
-
-                if (comm.URL) {
-                    messageContentHtml = `<a href="${comm.URL}" target="_blank">${messageText}</a> <i class="fas fa-external-link-alt"></i>`;
-                } else {
-                    messageContentHtml = messageText;
-                }
-                
+                let messageContentHtml = comm.URL ? `<a href="${comm.URL}" target="_blank">${messageText}</a> <i class="fas fa-external-link-alt"></i>` : messageText;
                 commElement.innerHTML = `${dateHtml}<p class="communication-message-text">${messageContentHtml}</p>`;
                 listContainer.appendChild(commElement);
             });
         }
 
-
         function initializeDashboardWithData(dataFromServer) {
             if (!dataFromServer || dataFromServer.error) {
                 const errorMsg = dataFromServer ? dataFromServer.error : "No se recibieron datos del servidor.";
                 displayErrorOnOverlay(`<div>Error: ${errorMsg}</div><p>Por favor, verifica la configuración de tu Spreadsheet ID y los nombres de las hojas.</p>`); 
-                console.error("Error init:", errorMsg); return; 
+                return; 
             }
-            
             appConfig = dataFromServer.config || {};
             document.getElementById('app-main-title').textContent = appConfig.APP_TITLE || 'Scrum App';
             document.title = appConfig.APP_TITLE || 'Scrum App';
-
             const subtitleElement = document.getElementById('app-main-subtitle');
             if (appConfig.APP_SUBTITLE && subtitleElement) {
                 subtitleElement.textContent = appConfig.APP_SUBTITLE;
@@ -1498,45 +1341,36 @@
             } else if (subtitleElement) {
                 subtitleElement.style.display = 'none';
             }
-
             document.getElementById('help-chat-link').href = appConfig.HELP_CHAT_URL || '#';
-            
             masterFeaturesData = dataFromServer.features || [];
             masterAnnouncementsData = dataFromServer.announcements || []; 
             masterQuickLinksData = dataFromServer.quickLinks || []; 
             masterImpedimentsData = dataFromServer.impediments || []; 
             allFeaturesForImpediments = dataFromServer.allFeaturesForImpediments || []; 
-            nonDeployedUserStoriesForImpediments = dataFromServer.nonDeployedUserStories || []; 
+            masterPendingUserStoriesData = dataFromServer.nonDeployedUserStories || []; 
             upcomingEventsData = dataFromServer.upcomingEvents || []; 
             masterPodiumDataFeatures = dataFromServer.podiumDataFeatures || [];
             masterPodiumDataUserStories = dataFromServer.podiumDataUserStories || [];
             masterPodiumDataDependencies = dataFromServer.podiumDataDependencies || []; 
             masterCommunicationsData = dataFromServer.communications || [];
-
-
             availableQs = dataFromServer.availableQs || [];
             availableSprints = dataFromServer.availableSprints || [];
-
             const userGreetingContainer = document.getElementById('user-greeting-container');
             const userGreetingEmailSpan = document.getElementById('user-greeting-email');
             const emailFooter = document.getElementById('user-email-footer-display');
-
             if (dataFromServer.currentUserEmail && userGreetingEmailSpan && userGreetingContainer) {
                 userGreetingEmailSpan.textContent = dataFromServer.currentUserEmail;
                 userGreetingContainer.style.display = 'block'; 
             } else if (userGreetingContainer) {
                  userGreetingContainer.style.display = 'none';
             }
-            
             if (appConfig.APP_DATA_SOURCE_URL && appConfig.APP_DATA_SOURCE_URL !== '#' && emailFooter) {
-                // Requerimiento Footer: Mostrar "Documento Fuente" como enlace
                 emailFooter.innerHTML = `<a href="${appConfig.APP_DATA_SOURCE_URL}" target="_blank" class="text-gray-400 hover:text-gray-200 underline">Documento Fuente</a>`;
             } else if (dataFromServer.currentUserEmail && emailFooter) {
                 emailFooter.textContent = `Conectado como: ${dataFromServer.currentUserEmail}`;
             } else if (emailFooter) {
                 emailFooter.textContent = '';
             }
-            
             populateFilters(); 
             populateImpedimentFeatureFilter(); 
             applyFiltersAndRender(); 
@@ -1544,13 +1378,10 @@
             renderImpediments(); 
             renderUpcomingEvents();
             renderTeamCommunications(); 
-            
             updateSprintDetails(); 
             setInterval(updateSprintDetails, 1000); 
             displayAnnouncements(); 
-            
             google.script.run.withSuccessHandler(displayTeamMood).getTeamMood();
-
             hideLoading(); 
         }
 
@@ -1560,10 +1391,8 @@
                 .withSuccessHandler(initializeDashboardWithData) 
                 .withFailureHandler(err => { 
                     displayErrorOnOverlay(`Fallo crítico al cargar datos: ${err.message}. <br>Asegúrate de que el script tiene permisos y el Spreadsheet ID es correcto.`); 
-                    console.error("Fallo getAllSheetData:", err);
                 })
                 .getAllSheetData(); 
-            
             setupFilterListeners(); 
             setupMoodSelector(); 
             setupImpedimentSubmission(); 
